@@ -92,17 +92,34 @@ export default function App(
   useEffect(() => {
     const hasPromptedInstall = localStorage.getItem('party-land-install-prompted');
     
+    console.log('🔍 Install check:', { 
+      isSDKLoaded, 
+      hasActions: !!actions, 
+      added, 
+      hasPromptedInstall: !!hasPromptedInstall 
+    });
+    
     if (isSDKLoaded && actions && !added && !hasPromptedInstall) {
+      console.log('✅ Conditions met. Will show install prompt in 1.5s...');
       // Wait a bit for the app to load before showing the prompt
       const timer = setTimeout(() => {
-        actions.addMiniApp().catch((error) => {
-          console.log('User declined installation or error:', error);
-        });
-        // Mark that we've prompted, so we don't show it again
-        localStorage.setItem('party-land-install-prompted', 'true');
+        console.log('🚀 Calling actions.addMiniApp()...');
+        actions.addMiniApp()
+          .then(() => {
+            console.log('✅ Install prompt shown successfully');
+            localStorage.setItem('party-land-install-prompted', 'true');
+          })
+          .catch((error) => {
+            console.error('❌ Install error:', error);
+            console.log('User declined installation or error:', error);
+            // Still mark as prompted to avoid infinite loops
+            localStorage.setItem('party-land-install-prompted', 'true');
+          });
       }, 1500); // 1.5 seconds delay for better UX
       
       return () => clearTimeout(timer);
+    } else {
+      console.log('⏭️ Skipping install prompt (conditions not met)');
     }
   }, [isSDKLoaded, actions, added]);
 
