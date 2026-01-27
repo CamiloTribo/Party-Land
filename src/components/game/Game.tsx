@@ -5,10 +5,11 @@ import StartScreen from "./StartScreen";
 import GameScreen from "./GameScreen";
 import GameOverScreen from "./GameOverScreen";
 import VictoryScreen from "./VictoryScreen";
+import ShopScreen from "./ShopScreen";
 import { useUserGameData } from '~/hooks/useUserGameData';
 
 // Game state type
-type GameState = "start" | "playing" | "gameover" | "victory";
+type GameState = "start" | "playing" | "gameover" | "victory" | "shop";
 
 export default function Game() {
   const [gameState, setGameState] = useState<GameState>("start");
@@ -49,8 +50,13 @@ export default function Game() {
   };
 
   const handleOpenShop = () => {
-    // TODO: Implement shop
-    console.log('Shop not implemented yet');
+    console.log('✅ Opening shop!');
+    setGameState('shop');
+  };
+
+  const handleCloseShop = () => {
+    console.log('✅ Closing shop, back to start');
+    setGameState('start');
   };
 
   const handleToggleSound = () => setSoundEnabled((s) => !s);
@@ -91,6 +97,9 @@ export default function Game() {
           onBackToMenu={() => setGameState('start')}
           selectedSkin={selectedSkin}
         />
+      )}
+      {gameState === 'shop' && (
+        <ShopScreen onBack={handleCloseShop} />
       )}
     </main>
   );
