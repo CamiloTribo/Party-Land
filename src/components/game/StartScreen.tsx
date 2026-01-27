@@ -4,6 +4,7 @@ import { Button } from '~/components/ui/Button';
 import { Volume2, VolumeX, ShoppingBag } from 'lucide-react';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { useUserGameData } from '~/hooks/useUserGameData';
+import { GameAuthButton } from './GameAuthButton';
 
 interface StartScreenProps {
   onStart: () => void;
@@ -13,7 +14,7 @@ interface StartScreenProps {
 }
 
 export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggleSound }: StartScreenProps) {
-  const { tokens, selectedSkin, username } = useUserGameData();
+  const { tokens, selectedSkin, username, displayName, pfpUrl, fid } = useUserGameData();
 
   return (
     <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-pink-600 via-pink-500 to-pink-600 overflow-hidden">
@@ -69,16 +70,15 @@ export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggl
             SHOP
           </Button>
 
-          {/* Username Display */}
-          {username && (
-            <div className="w-full flex justify-center mt-1">
-              <div className="border-2 border-white rounded-full px-4 py-1 bg-transparent backdrop-blur-sm shadow-lg">
-                <span className="text-white font-bold text-sm drop-shadow-md">
-                  {username}
-                </span>
-              </div>
-            </div>
-          )}
+          {/* Auth / Profile Section */}
+          <div className="w-full flex justify-center mt-2">
+            <GameAuthButton
+              username={username}
+              displayName={displayName}
+              pfpUrl={pfpUrl}
+              fid={fid}
+            />
+          </div>
         </div>
       </div>
       {/* Sound toggle */}

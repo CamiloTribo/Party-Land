@@ -122,7 +122,8 @@ export function useUserGameData() {
     unlockTheme,
     // Farcaster session data
     fid: user?.fid,
-    username: user?.fid ? `@${user.fid}` : undefined,
-    displayName: user?.fid ? `User ${user.fid}` : undefined,
+    username: user?.username,
+    displayName: user?.display_name,
+    pfpUrl: user?.pfp_url,
   };
 }
