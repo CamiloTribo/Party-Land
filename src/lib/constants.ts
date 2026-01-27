@@ -78,6 +78,29 @@ export const APP_ACCOUNT_ASSOCIATION: AccountAssociation | undefined = {
   signature: "e88VWkw4dID1wAeZmKfbsvsvqHGzyWGgu5t+AsU/wwB+4mp6qPYJgsLdjujfShNtyOg1/hi0KHvqU6VYdmvG3Bs="
 };
 
+// --- Payment Configuration ---
+/**
+ * Wallet address for receiving payments from users.
+ * All in-app purchases and payments will be sent to this address.
+ */
+export const PAYMENT_WALLET_ADDRESS: `0x${string}` = '0x27093F850B8E60E6f52610CBdD824D21ac29fbCB';
+
+/**
+ * Primary chain for payments (Base - optimized for low fees).
+ * Base is the recommended chain for Farcaster apps due to:
+ * - Very low transaction fees (~$0.001)
+ * - Native USDC support
+ * - High adoption among Farcaster users
+ */
+export const PAYMENT_CHAIN_ID = 8453; // Base mainnet
+
+/**
+ * USDC contract address on Base.
+ * Used for stablecoin payments.
+ */
+export const USDC_ADDRESS: `0x${string}` = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+
+
 // --- UI Configuration ---
 /**
  * Text displayed on the main action button.
