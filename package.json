@@ -46,7 +46,7 @@
   "dependencies": {
     "@farcaster/auth-client": ">=0.3.0 <1.0.0",
     "@farcaster/auth-kit": ">=0.6.0 <1.0.0",
-    "@farcaster/mini-app-solana": ">=0.0.17 <1.0.0",
+    "@farcaster/mini-app-solana": ">=0.0.17 <2.0.0",
     "@farcaster/miniapp-node": ">=0.1.5 <1.0.0",
     "@farcaster/miniapp-sdk": "^0.2.2",
     "@farcaster/miniapp-wagmi-connector": "^1.0.0",
