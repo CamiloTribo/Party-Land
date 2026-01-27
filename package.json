@@ -22,6 +22,9 @@
     "cleanup": "node scripts/cleanup.js"
   },
   "overrides": {
+    "@walletconnect/ethereum-provider": "^2.22.0",
+    "@walletconnect/sign-client": "^2.22.0",
+    "@walletconnect/universal-provider": "^2.22.0",
     "backslash": "0.2.0",
     "chalk-template": "1.1.0",
     "supports-hyperlinks": "4.1.0",
@@ -77,7 +80,7 @@
     "@types/react-dom": "^19",
     "@vercel/sdk": "^1.9.0",
     "crypto": "^1.0.1",
-    "eslint": "^8",
+    "eslint": "^9",
     "eslint-config-next": "15.0.3",
     "inquirer": "^10.2.2",
     "pino-pretty": "^13.0.0",
@@ -108,6 +111,9 @@
   },
   "pnpm": {
     "overrides": {
+      "@walletconnect/ethereum-provider": "^2.22.0",
+      "@walletconnect/sign-client": "^2.22.0",
+      "@walletconnect/universal-provider": "^2.22.0",
       "backslash": "0.2.0",
       "chalk-template": "1.1.0",
       "supports-hyperlinks": "4.1.0",
