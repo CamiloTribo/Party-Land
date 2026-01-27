@@ -5,11 +5,13 @@ import StartScreen from "./StartScreen";
 import GameScreen from "./GameScreen";
 import GameOverScreen from "./GameOverScreen";
 import VictoryScreen from "./VictoryScreen";
+import ShopMenuScreen from "./ShopMenuScreen";
 import ShopScreen from "./ShopScreen";
+import ShopThemesScreen from "./ShopThemesScreen";
 import { useUserGameData } from '~/hooks/useUserGameData';
 
 // Game state type
-type GameState = "start" | "playing" | "gameover" | "victory" | "shop";
+type GameState = "start" | "playing" | "gameover" | "victory" | "shop-menu" | "shop-skins" | "shop-themes";
 
 export default function Game() {
   const [gameState, setGameState] = useState<GameState>("start");
@@ -50,8 +52,18 @@ export default function Game() {
   };
 
   const handleOpenShop = () => {
-    console.log('✅ Opening shop!');
-    setGameState('shop');
+    console.log('✅ Opening shop menu!');
+    setGameState('shop-menu');
+  };
+
+  const handleOpenSkins = () => {
+    console.log('✅ Opening skins shop!');
+    setGameState('shop-skins');
+  };
+
+  const handleOpenThemes = () => {
+    console.log('✅ Opening themes shop!');
+    setGameState('shop-themes');
   };
 
   const handleCloseShop = () => {
@@ -88,8 +100,18 @@ export default function Game() {
           onBackToMenu={() => setGameState('start')}
           selectedSkin={selectedSkin}
         />
+      )}-menu' && (
+        <ShopMenuScreen
+          onSelectSkins={handleOpenSkins}
+          onSelectThemes={handleOpenThemes}
+          onBack={handleCloseShop}
+        />
       )}
-      {gameState === 'victory' && (
+      {gameState === 'shop-skins' && (
+        <ShopScreen onBack={() => setGameState('shop-menu')} />
+      )}
+      {gameState === 'shop-themes' && (
+        <ShopThemesScreen onBack={() => setGameState('shop-menu')
         <VictoryScreen
           score={finalScore}
           tokensEarned={tokensEarned}
