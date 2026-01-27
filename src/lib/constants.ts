@@ -22,13 +22,13 @@ export const APP_URL: string = process.env.NEXT_PUBLIC_URL!;
  * The name of the mini app as displayed to users.
  * Used in titles, headers, and app store listings.
  */
-export const APP_NAME: string = 'Party Land';
+export const APP_NAME: string = '100 Floor Drop';
 
 /**
  * A brief description of the mini app's functionality.
  * Used in app store listings and metadata.
  */
-export const APP_DESCRIPTION: string = 'Party with friends';
+export const APP_DESCRIPTION: string = 'Drop through 100 floors, collect skins, and compete!';
 
 /**
  * The primary category for the mini app.
@@ -84,6 +84,11 @@ export const APP_ACCOUNT_ASSOCIATION: AccountAssociation | undefined = {
  * All in-app purchases and payments will be sent to this address.
  */
 export const PAYMENT_WALLET_ADDRESS: `0x${string}` = '0x27093F850B8E60E6f52610CBdD824D21ac29fbCB';
+
+/**
+ * Price for premium skins in USDC (Base network)
+ */
+export const PREMIUM_SKIN_PRICE_USDC = 2.3;
 
 /**
  * Primary chain for payments (Base - optimized for low fees).
