@@ -59,6 +59,8 @@ export default function App(
     setInitialTab,
     setActiveTab,
     currentTab,
+    actions,
+    added,
   } = useMiniApp();
 
   // --- Neynar user hook ---
@@ -77,6 +79,32 @@ export default function App(
       setInitialTab(Tab.Home);
     }
   }, [isSDKLoaded, setInitialTab]);
+
+  /**
+   * Automatically prompts user to install the mini app on first visit
+   * 
+   * This effect shows the official Farcaster "Add to client" modal
+   * when the user opens the app for the first time. It only runs if:
+   * - SDK is loaded
+   * - User hasn't added the app yet
+   * - Actions are available
+   */
+  useEffect(() => {
+    const hasPromptedInstall = localStorage.getItem('party-land-install-prompted');
+    
+    if (isSDKLoaded && actions && !added && !hasPromptedInstall) {
+      // Wait a bit for the app to load before showing the prompt
+      const timer = setTimeout(() => {
+        actions.addMiniApp().catch((error) => {
+          console.log('User declined installation or error:', error);
+        });
+        // Mark that we've prompted, so we don't show it again
+        localStorage.setItem('party-land-install-prompted', 'true');
+      }, 1500); // 1.5 seconds delay for better UX
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isSDKLoaded, actions, added]);
 
   // --- Early Returns ---
   if (!isSDKLoaded) {
