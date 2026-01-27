@@ -5,6 +5,8 @@ import { Volume2, VolumeX, ShoppingBag } from 'lucide-react';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import { GameAuthButton } from './GameAuthButton';
+import { useMiniApp } from '@neynar/react';
+import { useEffect } from 'react';
 
 interface StartScreenProps {
   onStart: () => void;
@@ -14,7 +16,14 @@ interface StartScreenProps {
 }
 
 export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggleSound }: StartScreenProps) {
-  const { tokens, selectedSkin, username, displayName, pfpUrl, fid } = useUserGameData();
+  const { context } = useMiniApp();
+  const { tokens, selectedSkin, username, displayName, pfpUrl, fid } = useUserGameData(context || undefined);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('🎮 [StartScreen] Farcaster context:', context);
+    console.log('👤 [StartScreen] User data:', { username, displayName, fid });
+  }, [context, username, displayName, fid]);
 
   return (
     <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-pink-600 via-pink-500 to-pink-600 overflow-hidden">

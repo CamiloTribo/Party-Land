@@ -3,7 +3,7 @@
 import { useMiniApp } from '@neynar/react';
 import { LogIn, User } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface GameAuthButtonProps {
   username?: string;
@@ -18,6 +18,17 @@ export function GameAuthButton({ username, displayName, pfpUrl, fid }: GameAuthB
   
   // If we're in Farcaster/Warpcast and user is authenticated
   const isAuthenticated = !!context?.user?.fid || !!fid;
+
+  // Debug logging
+  useEffect(() => {
+    console.log('🔐 [GameAuthButton] Auth check:', {
+      contextFid: context?.user?.fid,
+      propFid: fid,
+      username,
+      displayName,
+      isAuthenticated
+    });
+  }, [context, fid, username, displayName, isAuthenticated]);
 
   if (isAuthenticated && username) {
     // Show user profile button

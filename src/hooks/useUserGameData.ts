@@ -12,9 +12,15 @@ const DEFAULT_THEMES = [
 const DEFAULT_SKIN = 'classic';
 const DEFAULT_THEME = 'classic-pink';
 
-export function useUserGameData() {
+export function useUserGameData(context?: { user?: { fid?: number } }) {
   // Get Farcaster user data from existing Neynar hook
-  const { user } = useNeynarUser();
+  const { user } = useNeynarUser(context);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 [useUserGameData] Context:', context);
+    console.log('👤 [useUserGameData] User from Neynar:', user);
+  }, [context, user]);
 
   // Flag to track if we've loaded from localStorage
   const isInitialized = useRef(false);
