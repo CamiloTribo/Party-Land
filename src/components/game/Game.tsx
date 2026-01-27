@@ -100,7 +100,17 @@ export default function Game() {
           onBackToMenu={() => setGameState('start')}
           selectedSkin={selectedSkin}
         />
-      )}-menu' && (
+      )}
+      {gameState === 'victory' && (
+        <VictoryScreen
+          score={finalScore}
+          tokensEarned={tokensEarned}
+          onRestart={handleRestart}
+          onBackToMenu={() => setGameState('start')}
+          selectedSkin={selectedSkin}
+        />
+      )}
+      {gameState === 'shop-menu' && (
         <ShopMenuScreen
           onSelectSkins={handleOpenSkins}
           onSelectThemes={handleOpenThemes}
@@ -111,17 +121,7 @@ export default function Game() {
         <ShopScreen onBack={() => setGameState('shop-menu')} />
       )}
       {gameState === 'shop-themes' && (
-        <ShopThemesScreen onBack={() => setGameState('shop-menu')
-        <VictoryScreen
-          score={finalScore}
-          tokensEarned={tokensEarned}
-          onRestart={handleRestart}
-          onBackToMenu={() => setGameState('start')}
-          selectedSkin={selectedSkin}
-        />
-      )}
-      {gameState === 'shop' && (
-        <ShopScreen onBack={handleCloseShop} />
+        <ShopThemesScreen onBack={() => setGameState('shop-menu')} />
       )}
     </main>
   );
