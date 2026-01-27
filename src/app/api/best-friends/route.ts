@@ -9,8 +9,10 @@ export async function GET(request: Request) {
     },
     { status: 200 } // Return 200 to avoid errors in the UI
   );
+}
 
-  /* ORIGINAL CODE - Requires paid plan
+/* ORIGINAL CODE - Requires paid plan
+export async function GET_ORIGINAL(request: Request) {
   const apiKey = process.env.NEYNAR_API_KEY;
   const { searchParams } = new URL(request.url);
   const fid = searchParams.get('fid');
@@ -53,4 +55,5 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
-} 
+}
+*/ 
