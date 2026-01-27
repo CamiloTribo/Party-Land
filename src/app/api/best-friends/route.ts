@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
+  // DISABLED: best_friends API requires a paid Neynar plan
+  return NextResponse.json(
+    { 
+      error: 'Best friends API is a premium feature. Upgrade your Neynar plan to use this.',
+      users: []
+    },
+    { status: 200 } // Return 200 to avoid errors in the UI
+  );
+
+  /* ORIGINAL CODE - Requires paid plan
   const apiKey = process.env.NEYNAR_API_KEY;
   const { searchParams } = new URL(request.url);
   const fid = searchParams.get('fid');

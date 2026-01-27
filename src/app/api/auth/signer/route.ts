@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server';
 import { getNeynarClient } from '~/lib/neynar';
 
 export async function POST() {
+  // DISABLED: createSigner requires a paid Neynar plan
+  return NextResponse.json(
+    { 
+      error: 'Signer creation is a premium feature. Use the free QuickAuth flow instead or upgrade your Neynar plan.',
+      requiresUpgrade: true
+    },
+    { status: 402 }
+  );
+
+  /* ORIGINAL CODE - Requires paid plan
   try {
     const neynarClient = getNeynarClient();
     const signer = await neynarClient.createSigner();
@@ -13,6 +23,7 @@ export async function POST() {
       { status: 500 }
     );
   }
+  */
 }
 
 export async function GET(request: Request) {
