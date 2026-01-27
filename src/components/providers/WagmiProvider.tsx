@@ -17,9 +17,10 @@ function useCoinbaseWalletAutoConnect() {
   useEffect(() => {
     // Check if we're running in Coinbase Wallet
     const checkCoinbaseWallet = () => {
-      const isInCoinbaseWallet = window.ethereum?.isCoinbaseWallet || 
-        window.ethereum?.isCoinbaseWalletExtension ||
-        window.ethereum?.isCoinbaseWalletBrowser;
+      const ethereum = (window as any).ethereum;
+      const isInCoinbaseWallet = ethereum?.isCoinbaseWallet || 
+        ethereum?.isCoinbaseWalletExtension ||
+        ethereum?.isCoinbaseWalletBrowser;
       setIsCoinbaseWallet(!!isInCoinbaseWallet);
     };
     
