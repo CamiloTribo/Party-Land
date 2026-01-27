@@ -9,6 +9,7 @@ import { APP_NAME } from "../../../lib/constants";
 import { renderError } from "../../../lib/errorUtils";
 
 
+
 /**
  * SignEvmMessage component handles signing messages on EVM-compatible chains.
  * 
