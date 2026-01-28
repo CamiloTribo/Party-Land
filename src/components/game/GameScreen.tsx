@@ -27,14 +27,41 @@ interface Floor {
 
 const getThemeColors = (theme: string) => {
   const themeMap: Record<string, { top: string; bottom: string }> = {
+    // Free token themes
     'classic-pink': { top: '#831843', bottom: '#be185d' },
     'ocean-blue': { top: '#0c4a6e', bottom: '#0369a1' },
     'forest-green': { top: '#14532d', bottom: '#15803d' },
     'sunset-orange': { top: '#7c2d12', bottom: '#c2410c' },
-    'midnight-purple': { top: '#3b0764', bottom: '#6b21a8' },
-    'crimson-red': { top: '#7f1d1d', bottom: '#b91c1c' },
-    'golden-yellow': { top: '#713f12', bottom: '#a16207' },
-    'arctic-cyan': { top: '#164e63', bottom: '#0e7490' },
+    // Premium token themes
+    'royal-purple': { top: '#581c87', bottom: '#6b21a8' },
+    'fire-red': { top: '#7f1d1d', bottom: '#991b1b' },
+    'cyber-neon': { top: '#164e63', bottom: '#6b21a8' },
+    'golden-luxury': { top: '#713f12', bottom: '#a16207' },
+    'midnight-dark': { top: '#334155', bottom: '#0f172a' },
+    'candy-pop': { top: '#ec4899', bottom: '#3b82f6' },
+    'toxic-slime': { top: '#65a30d', bottom: '#15803d' },
+    'arctic-ice': { top: '#67e8f9', bottom: '#0ea5e9' },
+    'lava-flow': { top: '#ea580c', bottom: '#18181b' },
+    'galaxy-space': { top: '#312e81', bottom: '#ec4899' },
+    'rainbow-dream': { top: '#ef4444', bottom: '#8b5cf6' },
+    'diamond-shine': { top: '#e5e7eb', bottom: '#a78bfa' },
+    // USDC exclusive themes
+    'gotham-city': { top: '#232526', bottom: '#434343' },
+    'metropolis-sky': { top: '#2563eb', bottom: '#f43f5e' },
+    'spider-web': { top: '#be123c', bottom: '#2563eb' },
+    'arc-reactor': { top: '#f59e42', bottom: '#be123c' },
+    'gamma-rage': { top: '#22d3ee', bottom: '#a21caf' },
+    'asgard-thunder': { top: '#fbbf24', bottom: '#2563eb' },
+    'hogwarts-magic': { top: '#f59e42', bottom: '#be123c' },
+    'the-force': { top: '#2563eb', bottom: '#be123c' },
+    'matrix-code': { top: '#0f2027', bottom: '#00ff99' },
+    'chaotic-madness': { top: '#a21caf', bottom: '#22d3ee' },
+    'speed-force': { top: '#fbbf24', bottom: '#be123c' },
+    'merc-style': { top: '#be123c', bottom: '#0f172a' },
+    'amazonian-warrior': { top: '#f43f5e', bottom: '#2563eb' },
+    'star-spangled': { top: '#2563eb', bottom: '#f43f5e' },
+    'sonic-boom': { top: '#2563eb', bottom: '#fbbf24' },
+    'mushroom-kingdom': { top: '#dc2626', bottom: '#16a34a' },
   }
   return themeMap[theme] || themeMap['classic-pink']
 }

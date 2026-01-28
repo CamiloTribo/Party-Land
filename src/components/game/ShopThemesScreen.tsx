@@ -205,12 +205,12 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
               >
                 {/* USDC Badge */}
                 {tab === 'usdc' && (
-                  <div className="absolute -top-2 -right-2 z-10">
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white/30">
+                  <div className="absolute top-1 right-1 z-10">
+                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white/20">
                       💵 USDC
                     </div>
                   </div>
-                )}
+                )}  
 
                 {/* Selected Check */}
                 {isSelected && (
