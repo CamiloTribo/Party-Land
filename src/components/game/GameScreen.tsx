@@ -155,7 +155,7 @@ export default function GameScreen({ onGameOver, onVictory, soundEnabled, select
     playerHeight: 50,
     floorHeight: 20,
     gravity: 0.8,
-    moveSpeed: 12,
+    moveSpeed: 16,
     isMovingLeft: false,
     isMovingRight: false,
     gameStarted: false,
@@ -166,13 +166,13 @@ export default function GameScreen({ onGameOver, onVictory, soundEnabled, select
     laserActivationDelay: 2000,
     isSlowed: false,
     slowEndTime: 0,
-    normalMoveSpeed: 12,
+    normalMoveSpeed: 16,
   })
 
   const generateFloor = useCallback((floorNumber: number): Floor => {
     const difficulty = Math.max(0, (100 - floorNumber) / 100)
-    const gapSize = 120 - difficulty * 40
-    const hasObstacle = Math.random() < difficulty * 0.5
+    const gapSize = 80 - difficulty * 30
+    const hasObstacle = Math.random() < difficulty * 0.8
 
     let obstacleType: 'guard' | 'dog' | undefined
     if (hasObstacle) {
@@ -376,7 +376,7 @@ export default function GameScreen({ onGameOver, onVictory, soundEnabled, select
         }
 
         if (floor.obstacleType === 'guard') {
-          floor.obstacleX = obstacleX + (floor.obstacleDirection || 1) * 2
+          floor.obstacleX = obstacleX + (floor.obstacleDirection || 1) * 4
           if (floor.obstacleX < 20 || floor.obstacleX > canvas.width - 60) {
             floor.obstacleDirection = -(floor.obstacleDirection || 1)
           }
