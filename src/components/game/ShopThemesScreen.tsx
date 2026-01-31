@@ -1,9 +1,10 @@
 'use client';
 
-import { ArrowLeft, Lock, Eye } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, Lock, Eye, Coins, DollarSign, Palette, Sparkles, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import { PurchaseModal } from './PurchaseModal';
+import { drawThemeDecorations } from './ThemeDecorations';
 
 interface ShopThemesScreenProps {
   onBack: () => void;
@@ -66,8 +67,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
   const [tab, setTab] = useState<'tokens' | 'usdc'>('tokens');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'confirmation' | 'success'>('confirmation');
-  const [previewTheme, setPreviewTheme] = useState<string | null>(null);
-  const [selectedItem, setSelectedItem] = useState<{
+  const [previewTheme, setPreviewTheme] = useState<string | null>(null);  const canvasRef = useRef<HTMLCanvasElement>(null);  const [selectedItem, setSelectedItem] = useState<{
     id: string;
     name: string;
     cost: number;
@@ -135,19 +135,19 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
           {/* Balance Badges */}
           <div className="flex gap-2">
             <div className="flex items-center gap-1 bg-purple-800/80 px-3 py-1.5 rounded-full border-2 border-pink-500/40">
-              <span className="text-lg">🪙</span>
+              <Coins className="w-4 h-4 text-pink-400" />
               <span className="text-lg font-black text-pink-400">{tokens}</span>
             </div>
             <div className="flex items-center gap-1 bg-purple-800/80 px-3 py-1.5 rounded-full border-2 border-blue-500/40">
-              <span className="text-lg">💵</span>
+              <DollarSign className="w-4 h-4 text-blue-400" />
               <span className="text-lg font-black text-blue-400">{usdcBalance.toFixed(1)}</span>
             </div>
           </div>
         </div>
 
         <div className="px-4 pb-3">
-          <h1 className="text-3xl font-black text-yellow-300 text-center drop-shadow-lg">
-            🎨 THEME SHOP
+          <h1 className="text-3xl font-black text-yellow-300 text-center drop-shadow-lg flex items-center justify-center gap-2">
+            <Palette className="w-7 h-7" /> THEME SHOP
           </h1>
         </div>
 
@@ -167,7 +167,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                 tab === 'tokens' ? 'text-white' : 'text-white/60'
               }`}
             >
-              <span className="text-base">🪙</span>
+              <Coins className="w-4 h-4" />
               Tokens
             </button>
             <button
@@ -176,7 +176,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                 tab === 'usdc' ? 'text-white' : 'text-white/60'
               }`}
             >
-              <span className="text-base">💵</span>
+              <DollarSign className="w-4 h-4" />
               USDC Exclusives
             </button>
           </div>
@@ -217,8 +217,8 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                 {/* USDC Badge */}
                 {tab === 'usdc' && (
                   <div className="absolute -top-2 -right-2 z-10">
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white/30">
-                      💵 USDC
+                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white/30 flex items-center gap-0.5">
+                      <span className="text-[10px]">$</span> USDC
                     </div>
                   </div>
                 )}  
@@ -278,7 +278,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                     >
                       {canAfford || theme.cost === 0 ? (
                         <>
-                          {tab === 'usdc' ? '💵' : '🪙'} {theme.cost === 0 ? 'FREE' : theme.cost}
+                          {tab === 'usdc' ? <DollarSign className="w-3 h-3" /> : <Coins className="w-3 h-3" />} {theme.cost === 0 ? 'FREE' : theme.cost}
                         </>
                       ) : (
                         <>
@@ -333,41 +333,15 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                       </div>
                       <button
                         onClick={() => setPreviewTheme(null)}
-                        className="text-white/60 hover:text-white"
+                        className="text-white/60 hover:text-white transition-colors"
                       >
-                        ✕
+                        <X className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
 
-                  {/* Full Theme Preview */}
-                  <div className={`h-96 ${theme.bg} relative`}>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="text-6xl mb-4">🎨</div>
-                        <div className="text-white font-bold text-xl drop-shadow-lg">
-                          {theme.name}
-                        </div>
-                        <div className="text-white/80 text-sm mt-2 drop-shadow-lg">
-                          Full theme preview
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Show if theme has decorations (USDC exclusives) */}
-                    {tab === 'usdc' && (
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <div className="bg-black/50 backdrop-blur-sm rounded-lg p-3 text-center">
-                          <div className="text-white/90 text-xs font-bold mb-1">
-                            ✨ PREMIUM THEME
-                          </div>
-                          <div className="text-white/70 text-[10px]">
-                            Includes exclusive decorations & effects
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  {/* Theme Preview with Canvas for decorations */}
+                  <ThemePreviewCanvas themeId={theme.id} themeName={theme.name} isUSDC={tab === 'usdc'} />
 
                   {/* Footer */}
                   <div className="p-4 bg-gray-800/50">
@@ -385,5 +359,93 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
         </div>
       )}
     </div>
+  );
+}
+
+// Theme Preview Canvas Component
+function ThemePreviewCanvas({ themeId, themeName, isUSDC }: { themeId: string; themeName: string; isUSDC: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const getThemeColors = (theme: string) => {
+    const themeMap: Record<string, { top: string; bottom: string; decorations?: string[] }> = {
+      'classic-pink': { top: '#831843', bottom: '#be185d' },
+      'ocean-blue': { top: '#0c4a6e', bottom: '#0369a1' },
+      'forest-green': { top: '#14532d', bottom: '#15803d' },
+      'sunset-orange': { top: '#7c2d12', bottom: '#c2410c' },
+      'royal-purple': { top: '#581c87', bottom: '#6b21a8' },
+      'fire-red': { top: '#7f1d1d', bottom: '#991b1b' },
+      'cyber-neon': { top: '#164e63', bottom: '#6b21a8' },
+      'golden-luxury': { top: '#713f12', bottom: '#a16207' },
+      'midnight-dark': { top: '#334155', bottom: '#0f172a' },
+      'candy-pop': { top: '#ec4899', bottom: '#3b82f6' },
+      'toxic-slime': { top: '#65a30d', bottom: '#15803d' },
+      'arctic-ice': { top: '#67e8f9', bottom: '#0ea5e9' },
+      'lava-flow': { top: '#ea580c', bottom: '#18181b' },
+      'galaxy-space': { top: '#312e81', bottom: '#ec4899' },
+      'rainbow-dream': { top: '#ef4444', bottom: '#8b5cf6' },
+      'diamond-shine': { top: '#e5e7eb', bottom: '#a78bfa' },
+      'gotham-city': { top: '#232526', bottom: '#434343', decorations: ['bat-signal', 'city-silhouette'] },
+      'metropolis-sky': { top: '#2563eb', bottom: '#f43f5e', decorations: ['s-symbol', 'clouds'] },
+      'spider-web': { top: '#be123c', bottom: '#2563eb', decorations: ['web-pattern', 'spider'] },
+      'arc-reactor': { top: '#f59e42', bottom: '#be123c', decorations: ['arc-reactor', 'tech-grid'] },
+      'gamma-rage': { top: '#22d3ee', bottom: '#a21caf', decorations: ['fist', 'cracks'] },
+      'asgard-thunder': { top: '#fbbf24', bottom: '#2563eb', decorations: ['hammer', 'lightning'] },
+      'hogwarts-magic': { top: '#f59e42', bottom: '#be123c', decorations: ['wand', 'stars', 'castle'] },
+      'the-force': { top: '#2563eb', bottom: '#be123c', decorations: ['lightsaber', 'death-star'] },
+      'matrix-code': { top: '#0f2027', bottom: '#00ff99', decorations: ['green-code', 'matrix-rain'] },
+      'chaotic-madness': { top: '#a21caf', bottom: '#22d3ee', decorations: ['cards', 'smile'] },
+      'speed-force': { top: '#fbbf24', bottom: '#be123c', decorations: ['lightning-bolt', 'speed-lines'] },
+      'merc-style': { top: '#be123c', bottom: '#0f172a', decorations: ['swords', 'logo'] },
+      'amazonian-warrior': { top: '#f43f5e', bottom: '#2563eb', decorations: ['tiara', 'stars', 'lasso'] },
+      'star-spangled': { top: '#2563eb', bottom: '#f43f5e', decorations: ['shield', 'star'] },
+      'sonic-boom': { top: '#2563eb', bottom: '#fbbf24', decorations: ['rings', 'speed-blur'] },
+      'mushroom-kingdom': { top: '#f43f5e', bottom: '#fbbf24', decorations: ['mushroom', 'coin', 'brick'] },
+    };
+    return themeMap[theme] || { top: '#831843', bottom: '#be185d' };
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const themeColors = getThemeColors(themeId);
+    
+    // Draw gradient background
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, themeColors.top);
+    gradient.addColorStop(1, themeColors.bottom);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw decorations if USDC theme
+    if (themeColors.decorations) {
+      drawThemeDecorations(ctx, themeId, themeColors, canvas.width, canvas.height, 0);
+    }
+
+    // Add theme name overlay
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(themeName, canvas.width / 2, canvas.height - 40);
+    
+    if (themeColors.decorations) {
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText('Premium Theme with Decorations', canvas.width / 2, canvas.height - 15);
+    }
+  }, [themeId, themeName]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={400}
+      height={384}
+      className="w-full h-96"
+    />
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Lock, Eye } from 'lucide-react';
+import { ArrowLeft, Lock, Eye, Coins, DollarSign, ShoppingBag, Sparkles } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import PinkPantherPlayer from '../PinkPantherPlayer';
@@ -11,23 +11,23 @@ interface ShopScreenProps {
   onBack: () => void;
 }
 
-// 16 Token Skins (completas)
+// 16 Token Skins
 const TOKEN_SKINS = [
-  { id: 'classic', name: 'Classic Pink', cost: 0, description: 'El gato original' },
-  { id: 'inspector', name: 'Inspector Pink', cost: 100, description: 'Modo detective' },
-  { id: 'miami', name: 'Miami Pink', cost: 250, description: 'Muy cool' },
-  { id: 'golden', name: 'Golden Panther', cost: 500, description: 'Puro lujo' },
-  { id: 'ninja', name: 'Ninja Pink', cost: 750, description: 'Modo sigiloso' },
-  { id: 'cyber', name: 'Cyber Pink', cost: 1000, description: 'Del futuro' },
-  { id: 'royal', name: 'Royal Pink', cost: 1500, description: 'Realeza' },
-  { id: 'space', name: 'Space Pink', cost: 2000, description: 'Espacial' },
-  { id: 'vampire', name: 'Vampire Pink', cost: 2500, description: 'De la noche' },
-  { id: 'pirate', name: 'Pirate Pink', cost: 3000, description: 'Pirata' },
-  { id: 'wizard', name: 'Wizard Pink', cost: 4000, description: 'Mágico' },
-  { id: 'knight', name: 'Knight Pink', cost: 5000, description: 'Caballero' },
-  { id: 'samurai', name: 'Samurai Pink', cost: 7500, description: 'Guerrero' },
+  { id: 'classic', name: 'Classic Pink', cost: 0, description: 'Original cat' },
+  { id: 'inspector', name: 'Inspector Pink', cost: 100, description: 'Detective mode' },
+  { id: 'miami', name: 'Miami Pink', cost: 250, description: 'Very cool' },
+  { id: 'golden', name: 'Golden Panther', cost: 500, description: 'Pure luxury' },
+  { id: 'ninja', name: 'Ninja Pink', cost: 750, description: 'Stealth mode' },
+  { id: 'cyber', name: 'Cyber Pink', cost: 1000, description: 'From future' },
+  { id: 'royal', name: 'Royal Pink', cost: 1500, description: 'Royalty' },
+  { id: 'space', name: 'Space Pink', cost: 2000, description: 'Cosmic' },
+  { id: 'vampire', name: 'Vampire Pink', cost: 2500, description: 'Night hunter' },
+  { id: 'pirate', name: 'Pirate Pink', cost: 3000, description: 'Sea raider' },
+  { id: 'wizard', name: 'Wizard Pink', cost: 4000, description: 'Magical' },
+  { id: 'knight', name: 'Knight Pink', cost: 5000, description: 'Brave knight' },
+  { id: 'samurai', name: 'Samurai Pink', cost: 7500, description: 'Warrior' },
   { id: 'robot', name: 'Robot Pink', cost: 10000, description: 'Tech AI' },
-  { id: 'diamond', name: 'Diamond Pink', cost: 15000, description: 'Precioso' },
+  { id: 'diamond', name: 'Diamond Pink', cost: 15000, description: 'Precious' },
   { id: 'legendary', name: 'Legendary Pink', cost: 25000, description: 'Ultimate' },
 ];
 
@@ -135,19 +135,19 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
           {/* Balance Badges */}
           <div className="flex gap-2">
             <div className="flex items-center gap-1 bg-purple-800/80 px-3 py-1.5 rounded-full border-2 border-pink-500/40">
-              <span className="text-lg">🪙</span>
+              <Coins className="w-4 h-4 text-pink-400" />
               <span className="text-lg font-black text-pink-400">{tokens}</span>
             </div>
             <div className="flex items-center gap-1 bg-purple-800/80 px-3 py-1.5 rounded-full border-2 border-blue-500/40">
-              <span className="text-lg">💵</span>
+              <DollarSign className="w-4 h-4 text-blue-400" />
               <span className="text-lg font-black text-blue-400">{usdcBalance.toFixed(1)}</span>
             </div>
           </div>
         </div>
 
         <div className="px-4 pb-3">
-          <h1 className="text-3xl font-black text-yellow-300 text-center drop-shadow-lg">
-            🛍️ SKIN SHOP
+          <h1 className="text-3xl font-black text-yellow-300 text-center drop-shadow-lg flex items-center justify-center gap-2">
+            <ShoppingBag className="w-7 h-7" /> SKIN SHOP
           </h1>
         </div>
 
@@ -167,7 +167,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
                 shopType === 'tokens' ? 'text-white' : 'text-white/60'
               }`}
             >
-              <span className="text-base">🪙</span>
+              <Coins className="w-4 h-4" />
               Token Skins
             </button>
             <button
@@ -176,7 +176,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
                 shopType === 'usdc' ? 'text-white' : 'text-white/60'
               }`}
             >
-              <span className="text-base">💵</span>
+              <DollarSign className="w-4 h-4" />
               USDC Exclusives
             </button>
           </div>
@@ -217,8 +217,8 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
                 {/* USDC Badge */}
                 {shopType === 'usdc' && (
                   <div className="absolute -top-2 -right-2 z-10">
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white/30">
-                      💵 USDC
+                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white/30 flex items-center gap-0.5">
+                      <span className="text-[10px]">$</span> USDC
                     </div>
                   </div>
                 )}
@@ -289,7 +289,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
                     >
                       {canAfford || skin.cost === 0 ? (
                         <>
-                          {shopType === 'usdc' ? '💵' : '🪙'} {skin.cost === 0 ? 'FREE' : skin.cost}
+                          {shopType === 'usdc' ? <DollarSign className="w-3 h-3" /> : <Coins className="w-3 h-3" />} {skin.cost === 0 ? 'FREE' : skin.cost}
                         </>
                       ) : (
                         <>
@@ -368,8 +368,8 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
                     {shopType === 'usdc' && (
                       <div className="absolute bottom-4 left-4 right-4">
                         <div className="bg-black/50 backdrop-blur-sm rounded-lg p-3 text-center">
-                          <div className="text-white/90 text-xs font-bold mb-1">
-                            ✨ PREMIUM SKIN
+                          <div className="text-white/90 text-xs font-bold mb-1 flex items-center justify-center gap-1">
+                            <Sparkles className="w-3 h-3" /> PREMIUM SKIN
                           </div>
                           <div className="text-white/70 text-[10px]">
                             Exclusive USDC skin

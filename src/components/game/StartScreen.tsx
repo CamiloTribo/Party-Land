@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '~/components/ui/Button';
-import { Volume2, VolumeX, ShoppingBag } from 'lucide-react';
+import { Volume2, VolumeX, ShoppingBag, Coins, DollarSign } from 'lucide-react';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import { GameAuthButton } from './GameAuthButton';
@@ -33,8 +33,8 @@ export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggl
       
       {/* Tokens Badge - Top Left */}
       <div className="absolute top-3 left-3 flex items-center gap-2 bg-[#2a003f]/90 px-4 py-2 rounded-full border-2 border-[#ff69b4]/60 z-10 backdrop-blur-sm shadow-xl">
-        <div className="w-7 h-7 rounded-full bg-yellow-400 flex items-center justify-center font-black text-purple-900 text-sm">
-          🪙
+        <div className="w-7 h-7 rounded-full bg-yellow-400 flex items-center justify-center">
+          <Coins className="w-4 h-4 text-purple-900" />
         </div>
         <span className="font-black text-2xl text-[#ff69b4] min-w-[50px]">{tokens}</span>
       </div>
@@ -53,8 +53,8 @@ export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggl
       
       {/* USDC Balance Badge - Top Center */}
       <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-[#2a003f]/90 px-4 py-2 rounded-full border-2 border-blue-400/60 z-10 backdrop-blur-sm shadow-xl">
-        <div className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center font-black text-white text-sm">
-          💵
+        <div className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center">
+          <DollarSign className="w-4 h-4 text-white" />
         </div>
         <span className="font-black text-2xl text-blue-400 min-w-[50px]">
           {usdcLoading ? '...' : usdcBalance.toFixed(2)}
