@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { useAccount } from 'wagmi';
 import { useNeynarUser } from './useNeynarUser';
+import { useUSDCBalance } from './useUSDCBalance';
 
 // Default values for a new user
 const DEFAULT_SKINS = ['classic'];
@@ -13,14 +15,22 @@ const DEFAULT_SKIN = 'classic';
 const DEFAULT_THEME = 'classic-pink';
 
 export function useUserGameData(context?: { user?: { fid?: number } }) {
+  // Get wallet from Farcaster/Wagmi
+  const { address: walletAddress, isConnected } = useAccount();
+  
   // Get Farcaster user data from existing Neynar hook
   const { user } = useNeynarUser(context);
+
+  // Get REAL USDC balance from blockchain
+  const { balance: usdcBalance, loading: usdcLoading, refetch: refetchUSDC } = useUSDCBalance();
 
   // Debug logging
   useEffect(() => {
     console.log('🔍 [useUserGameData] Context:', context);
     console.log('👤 [useUserGameData] User from Neynar:', user);
-  }, [context, user]);
+    console.log('💰 [useUserGameData] Wallet:', walletAddress);
+    console.log('💵 [useUserGameData] USDC Balance:', usdcBalance);
+  }, [context, user, walletAddress, usdcBalance]);
 
   // Flag to track if we've loaded from localStorage
   const isInitialized = useRef(false);
@@ -30,12 +40,6 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
     if (typeof window === 'undefined') return 0;
     const saved = localStorage.getItem('gameTokens');
     return saved ? parseInt(saved) : 0;
-  });
-
-  const [usdcBalance, setUsdcBalance] = useState(() => {
-    if (typeof window === 'undefined') return 0;
-    const saved = localStorage.getItem('usdcBalance');
-    return saved ? parseFloat(saved) : 0;
   });
 
   const [unlockedSkins, setUnlockedSkins] = useState<string[]>(() => {
@@ -69,6 +73,8 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
       selectedSkin,
       selectedTheme,
       farcasterFID: user?.fid,
+      wallet: walletAddress,
+      usdcBalance,
     });
     isInitialized.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,13 +86,6 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
     console.log('[useUserGameData] Saving tokens:', tokens);
     localStorage.setItem('gameTokens', tokens.toString());
   }, [tokens]);
-
-  // Save USDC balance to localStorage whenever it changes
-  useEffect(() => {
-    if (!isInitialized.current) return;
-    console.log('[useUserGameData] Saving USDC balance:', usdcBalance);
-    localStorage.setItem('usdcBalance', usdcBalance.toString());
-  }, [usdcBalance]);
 
   // Save unlocked skins to localStorage whenever they change
   useEffect(() => {
@@ -129,8 +128,9 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
   return {
     tokens,
     setTokens,
-    usdcBalance,
-    setUsdcBalance,
+    usdcBalance, // REAL balance from blockchain
+    usdcLoading,
+    refetchUSDC,
     unlockedSkins,
     setUnlockedSkins,
     selectedSkin,
@@ -141,6 +141,9 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
     selectedTheme,
     setSelectedTheme,
     unlockTheme,
+    // Wallet data from Wagmi
+    walletAddress,
+    isConnected,
     // Farcaster session data
     fid: user?.fid,
     username: user?.username,
