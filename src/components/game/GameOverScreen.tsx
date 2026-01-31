@@ -1,7 +1,7 @@
 // GameOverScreen component
 'use client';
 import { Button } from '~/components/ui/Button';
-import { RotateCcw, Home } from 'lucide-react';
+import { RotateCcw, Home, Coins } from 'lucide-react';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 
 interface GameOverScreenProps {
@@ -51,8 +51,8 @@ export default function GameOverScreen({ score, tokensEarned, onRestart, onBackT
               <div className="pt-3 border-t border-white/20">
                 <p className="text-yellow-400 text-base mb-2 font-bold">Tokens Earned</p>
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center font-black text-purple-900 text-sm">
-                    🪙
+                  <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center">
+                    <Coins className="w-5 h-5 text-purple-900" />
                   </div>
                   <p className="text-3xl font-black text-yellow-300 drop-shadow-lg">+{tokensEarned}</p>
                 </div>

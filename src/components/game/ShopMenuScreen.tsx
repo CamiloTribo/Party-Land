@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Shirt, Palette } from 'lucide-react';
+import { ArrowLeft, Shirt, Palette, ShoppingBag, Coins, DollarSign, Lightbulb } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
 import { useUserGameData } from '~/hooks/useUserGameData';
 
@@ -40,8 +40,8 @@ export default function ShopMenuScreen({
         </div>
 
         <div className="px-4 pb-4">
-          <h1 className="text-4xl font-black text-yellow-300 text-center drop-shadow-lg mb-2">
-            🛍️ SHOP
+          <h1 className="text-4xl font-black text-yellow-300 text-center drop-shadow-lg mb-2 flex items-center justify-center gap-2">
+            <ShoppingBag className="w-9 h-9" /> SHOP
           </h1>
           <p className="text-white/80 text-center text-sm">
             Customize your game
@@ -51,11 +51,11 @@ export default function ShopMenuScreen({
         {/* Token Badges */}
         <div className="flex justify-center gap-3 px-4 mb-8">
           <div className="flex items-center gap-2 bg-purple-800/80 px-4 py-2 rounded-full border-2 border-pink-500/40 shadow-lg backdrop-blur-sm">
-            <span className="text-xl">🪙</span>
+            <Coins className="w-5 h-5 text-pink-400" />
             <span className="font-bold text-xl text-pink-400">{tokens}</span>
           </div>
           <div className="flex items-center gap-2 bg-purple-800/80 px-4 py-2 rounded-full border-2 border-blue-500/40 shadow-lg backdrop-blur-sm">
-            <span className="text-xl">💵</span>
+            <DollarSign className="w-5 h-5 text-blue-400" />
             <span className="font-bold text-xl text-blue-400">{usdcBalance.toFixed(1)}</span>
           </div>
         </div>
@@ -121,8 +121,8 @@ export default function ShopMenuScreen({
 
         {/* Info Text */}
         <div className="mt-4 bg-purple-800/40 backdrop-blur-sm rounded-2xl p-4 border-2 border-pink-500/30">
-          <p className="text-white/90 text-sm text-center">
-            💡 Earn tokens by playing and unlock exclusive items with USDC!
+          <p className="text-white/90 text-sm text-center flex items-center justify-center gap-2">
+            <Lightbulb className="w-4 h-4" /> Earn tokens by playing and unlock exclusive items with USDC!
           </p>
         </div>
       </div>
