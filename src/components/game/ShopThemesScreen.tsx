@@ -202,7 +202,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                 }}
                 disabled={isSelected || (!isUnlocked && !canAfford && theme.cost > 0)}
                 className={`
-                  relative flex flex-col items-center p-3 rounded-2xl border-2 transition-all overflow-hidden
+                  relative flex flex-col items-center p-3 rounded-2xl border-2 transition-all
                   ${
                     isSelected
                       ? 'border-yellow-400 shadow-xl shadow-yellow-400/20 scale-[1.02]'
@@ -215,17 +215,17 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
               >
                 {/* USDC Badge */}
                 {tab === 'usdc' && (
-                  <div className="absolute top-2 right-2 z-10">
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white/20">
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white/30">
                       💵 USDC
                     </div>
                   </div>
                 )}  
 
-                {/* Selected Check - Higher z-index to appear above USDC badge */}
+                {/* Selected Check */}
                 {isSelected && (
-                  <div className="absolute -top-2 -left-2 z-20 bg-green-500 rounded-full w-7 h-7 flex items-center justify-center border-2 border-white shadow-lg">
-                    <span className="text-white text-sm font-bold">✓</span>
+                  <div className="absolute -top-2 -left-2 z-10 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center border-2 border-white">
+                    <span className="text-white text-xs">✓</span>
                   </div>
                 )}
 
