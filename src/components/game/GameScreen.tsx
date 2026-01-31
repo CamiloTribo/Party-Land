@@ -90,7 +90,7 @@ export default function GameScreen({ onGameOver, onVictory, soundEnabled, select
     playerHeight: 50,
     floorHeight: 20,
     gravity: 0.8,
-    moveSpeed: 8,
+    moveSpeed: 12,
     isMovingLeft: false,
     isMovingRight: false,
     gameStarted: false,
@@ -101,7 +101,7 @@ export default function GameScreen({ onGameOver, onVictory, soundEnabled, select
     laserActivationDelay: 2000,
     isSlowed: false,
     slowEndTime: 0,
-    normalMoveSpeed: 8,
+    normalMoveSpeed: 12,
   })
 
   const generateFloor = useCallback((floorNumber: number): Floor => {
@@ -554,29 +554,29 @@ export default function GameScreen({ onGameOver, onVictory, soundEnabled, select
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-0 right-0 flex justify-between px-8 z-20">
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-32 px-8 z-20">
         <Button
           size="lg"
-          className="w-20 h-20 rounded-full bg-pink-600 hover:bg-pink-500 shadow-2xl active:scale-95 select-none touch-manipulation"
+          className="w-24 h-24 rounded-full bg-gradient-to-br from-pink-500 to-pink-700 hover:from-pink-400 hover:to-pink-600 shadow-[0_8px_30px_rgba(236,72,153,0.5)] active:scale-90 transition-all select-none touch-manipulation border-4 border-white/30 flex items-center justify-center"
           onMouseDown={handleLeftPress}
           onMouseUp={handleLeftRelease}
           onMouseLeave={handleLeftRelease}
           onTouchStart={() => handleTouchStart('left')}
           onTouchEnd={() => handleTouchEnd('left')}
         >
-          <ChevronLeft className="w-10 h-10" />
+          <ChevronLeft className="w-12 h-12 text-white drop-shadow-lg" strokeWidth={3} />
         </Button>
 
         <Button
           size="lg"
-          className="w-20 h-20 rounded-full bg-pink-600 hover:bg-pink-500 shadow-2xl active:scale-95 select-none touch-manipulation"
+          className="w-24 h-24 rounded-full bg-gradient-to-br from-pink-500 to-pink-700 hover:from-pink-400 hover:to-pink-600 shadow-[0_8px_30px_rgba(236,72,153,0.5)] active:scale-90 transition-all select-none touch-manipulation border-4 border-white/30 flex items-center justify-center"
           onMouseDown={handleRightPress}
           onMouseUp={handleRightRelease}
           onMouseLeave={handleRightRelease}
           onTouchStart={() => handleTouchStart('right')}
           onTouchEnd={() => handleTouchEnd('right')}
         >
-          <ChevronRight className="w-10 h-10" />
+          <ChevronRight className="w-12 h-12 text-white drop-shadow-lg" strokeWidth={3} />
         </Button>
       </div>
     </div>

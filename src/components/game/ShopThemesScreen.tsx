@@ -33,22 +33,22 @@ const TOKEN_THEMES = [
 
 // 16 USDC Themes (superhéroes)
 const USDC_THEMES = [
-  { id: 'gotham-city', name: 'Gotham City', cost: 0.23, bg: 'bg-gradient-to-br from-[#232526] to-[#434343]', description: "Dark knight's domain" },
-  { id: 'metropolis-sky', name: 'Metropolis Sky', cost: 0.23, bg: 'bg-gradient-to-br from-[#2563eb] to-[#f43f5e]', description: 'Hope shines bright' },
-  { id: 'spider-web', name: 'Spider Web', cost: 0.23, bg: 'bg-gradient-to-br from-[#be123c] to-[#2563eb]', description: 'Swing through city' },
-  { id: 'arc-reactor', name: 'Arc Reactor', cost: 0.23, bg: 'bg-gradient-to-br from-[#f59e42] to-[#be123c]', description: 'Powered by tech' },
-  { id: 'gamma-rage', name: 'Gamma Rage', cost: 0.23, bg: 'bg-gradient-to-br from-[#22d3ee] to-[#a21caf]', description: 'Incredible strength' },
-  { id: 'asgard-thunder', name: 'Asgard Thunder', cost: 0.23, bg: 'bg-gradient-to-br from-[#fbbf24] to-[#2563eb]', description: 'Realm of gods' },
-  { id: 'hogwarts-magic', name: 'Hogwarts Magic', cost: 0.23, bg: 'bg-gradient-to-br from-[#f59e42] to-[#be123c]', description: 'Wizarding world' },
-  { id: 'the-force', name: 'The Force', cost: 0.23, bg: 'bg-gradient-to-br from-[#2563eb] to-[#be123c]', description: 'Light & dark side' },
-  { id: 'matrix-code', name: 'Matrix Code', cost: 0.23, bg: 'bg-gradient-to-br from-[#0f2027] to-[#00ff99]', description: 'Digital reality' },
-  { id: 'chaotic-madness', name: 'Chaotic Madness', cost: 0.23, bg: 'bg-gradient-to-br from-[#a21caf] to-[#22d3ee]', description: 'Why so serious?' },
-  { id: 'speed-force', name: 'Speed Force', cost: 0.23, bg: 'bg-gradient-to-br from-[#fbbf24] to-[#be123c]', description: 'Lightning fast' },
-  { id: 'merc-style', name: 'Merc Style', cost: 0.23, bg: 'bg-gradient-to-br from-[#be123c] to-[#0f172a]', description: 'Maximum effort' },
-  { id: 'amazonian-warrior', name: 'Amazonian Warrior', cost: 0.23, bg: 'bg-gradient-to-br from-[#f43f5e] to-[#2563eb]', description: 'Strength & honor' },
-  { id: 'star-spangled', name: 'Star Spangled', cost: 0.23, bg: 'bg-gradient-to-br from-[#2563eb] to-[#f43f5e]', description: 'Freedom forever' },
-  { id: 'sonic-boom', name: 'Sonic Boom', cost: 0.23, bg: 'bg-gradient-to-br from-[#2563eb] to-[#fbbf24]', description: 'Gotta go fast!' },
-  { id: 'mushroom-kingdom', name: 'Mushroom Kingdom', cost: 0.23, bg: 'bg-gradient-to-br from-[#be123c] to-[#22c55e]', description: "Let's-a-go!" },
+  { id: 'gotham-city', name: 'Gotham City', cost: 2.3, bg: 'bg-gradient-to-br from-[#232526] to-[#434343]', description: "Dark knight's domain" },
+  { id: 'metropolis-sky', name: 'Metropolis Sky', cost: 2.3, bg: 'bg-gradient-to-br from-[#2563eb] to-[#f43f5e]', description: 'Hope shines bright' },
+  { id: 'spider-web', name: 'Spider Web', cost: 2.3, bg: 'bg-gradient-to-br from-[#be123c] to-[#2563eb]', description: 'Swing through city' },
+  { id: 'arc-reactor', name: 'Arc Reactor', cost: 2.3, bg: 'bg-gradient-to-br from-[#f59e42] to-[#be123c]', description: 'Powered by tech' },
+  { id: 'gamma-rage', name: 'Gamma Rage', cost: 2.3, bg: 'bg-gradient-to-br from-[#22d3ee] to-[#a21caf]', description: 'Incredible strength' },
+  { id: 'asgard-thunder', name: 'Asgard Thunder', cost: 2.3, bg: 'bg-gradient-to-br from-[#fbbf24] to-[#2563eb]', description: 'Realm of gods' },
+  { id: 'hogwarts-magic', name: 'Hogwarts Magic', cost: 2.3, bg: 'bg-gradient-to-br from-[#f59e42] to-[#be123c]', description: 'Wizarding world' },
+  { id: 'the-force', name: 'The Force', cost: 2.3, bg: 'bg-gradient-to-br from-[#2563eb] to-[#be123c]', description: 'Light & dark side' },
+  { id: 'matrix-code', name: 'Matrix Code', cost: 2.3, bg: 'bg-gradient-to-br from-[#0f2027] to-[#00ff99]', description: 'Digital reality' },
+  { id: 'chaotic-madness', name: 'Chaotic Madness', cost: 2.3, bg: 'bg-gradient-to-br from-[#a21caf] to-[#22d3ee]', description: 'Why so serious?' },
+  { id: 'speed-force', name: 'Speed Force', cost: 2.3, bg: 'bg-gradient-to-br from-[#fbbf24] to-[#be123c]', description: 'Lightning fast' },
+  { id: 'merc-style', name: 'Merc Style', cost: 2.3, bg: 'bg-gradient-to-br from-[#be123c] to-[#0f172a]', description: 'Maximum effort' },
+  { id: 'amazonian-warrior', name: 'Amazonian Warrior', cost: 2.3, bg: 'bg-gradient-to-br from-[#f43f5e] to-[#2563eb]', description: 'Strength & honor' },
+  { id: 'star-spangled', name: 'Star Spangled', cost: 2.3, bg: 'bg-gradient-to-br from-[#2563eb] to-[#f43f5e]', description: 'Freedom forever' },
+  { id: 'sonic-boom', name: 'Sonic Boom', cost: 2.3, bg: 'bg-gradient-to-br from-[#2563eb] to-[#fbbf24]', description: 'Gotta go fast!' },
+  { id: 'mushroom-kingdom', name: 'Mushroom Kingdom', cost: 2.3, bg: 'bg-gradient-to-br from-[#be123c] to-[#22c55e]', description: "Let's-a-go!" },
 ];
 
 export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {

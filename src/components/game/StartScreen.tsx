@@ -30,6 +30,8 @@ export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggl
   return (
     <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-pink-600 via-pink-500 to-pink-600 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,50,150,0.3),transparent)]" />
+      
+      {/* Tokens Badge - Top Left */}
       <div className="absolute top-3 left-3 flex items-center gap-2 bg-[#2a003f]/90 px-4 py-2 rounded-full border-2 border-[#ff69b4]/60 z-10 backdrop-blur-sm shadow-xl">
         <div className="w-7 h-7 rounded-full bg-yellow-400 flex items-center justify-center font-black text-purple-900 text-sm">
           🪙
@@ -37,8 +39,20 @@ export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggl
         <span className="font-black text-2xl text-[#ff69b4] min-w-[50px]">{tokens}</span>
       </div>
       
-      {/* USDC Balance Badge */}
-      <div className="absolute top-3 right-3 flex items-center gap-2 bg-[#2a003f]/90 px-4 py-2 rounded-full border-2 border-blue-400/60 z-10 backdrop-blur-sm shadow-xl">
+      {/* Sound Toggle - Top Right */}
+      <button
+        onClick={onToggleSound}
+        className="absolute top-3 right-3 w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
+      >
+        {soundEnabled ? (
+          <Volume2 className="w-6 h-6 text-white" />
+        ) : (
+          <VolumeX className="w-6 h-6 text-white" />
+        )}
+      </button>
+      
+      {/* USDC Balance Badge - Top Center */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-[#2a003f]/90 px-4 py-2 rounded-full border-2 border-blue-400/60 z-10 backdrop-blur-sm shadow-xl">
         <div className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center font-black text-white text-sm">
           💵
         </div>
@@ -103,17 +117,7 @@ export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggl
           </div>
         </div>
       </div>
-      {/* Sound toggle */}
-      <button
-        onClick={onToggleSound}
-        className="absolute top-3 right-3 w-11 h-11 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
-      >
-        {soundEnabled ? (
-          <Volume2 className="w-6 h-6 text-white" />
-        ) : (
-          <VolumeX className="w-6 h-6 text-white" />
-        )}
-      </button>
+      
       {/* Instructions */}
       <div className="absolute bottom-4 text-center text-white/90 text-xs px-4 font-medium">
         <p>Use the buttons to move ← →</p>

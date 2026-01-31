@@ -87,9 +87,8 @@ export const PAYMENT_WALLET_ADDRESS: `0x${string}` = '0x27093F850B8E60E6f52610CB
 
 /**
  * Price for premium skins in USDC (Base network)
- * Temporarily lowered to 0.23 USDC for testing (original: 2.3)
  */
-export const PREMIUM_SKIN_PRICE_USDC = 0.23;
+export const PREMIUM_SKIN_PRICE_USDC = 2.3;
 
 /**
  * Primary chain for payments (Base - optimized for low fees).
