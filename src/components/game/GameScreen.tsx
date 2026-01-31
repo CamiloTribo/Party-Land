@@ -6,6 +6,7 @@ import { Button } from '~/components/ui/Button'
 import PinkPantherPlayer from '../PinkPantherPlayer'
 import AnimatedObstacle from '../AnimatedObstacle'
 import { SoundManager } from '~/lib/sounds'
+import { drawThemeDecorations } from './ThemeDecorations'
 
 interface GameScreenProps {
   onGameOver: (score: number) => void
@@ -26,7 +27,7 @@ interface Floor {
 }
 
 const getThemeColors = (theme: string) => {
-  const themeMap: Record<string, { top: string; bottom: string }> = {
+  const themeMap: Record<string, { top: string; bottom: string; decorations?: string[] }> = {
     // Free token themes
     'classic-pink': { top: '#831843', bottom: '#be185d' },
     'ocean-blue': { top: '#0c4a6e', bottom: '#0369a1' },
@@ -45,23 +46,87 @@ const getThemeColors = (theme: string) => {
     'galaxy-space': { top: '#312e81', bottom: '#ec4899' },
     'rainbow-dream': { top: '#ef4444', bottom: '#8b5cf6' },
     'diamond-shine': { top: '#e5e7eb', bottom: '#a78bfa' },
-    // USDC exclusive themes
-    'gotham-city': { top: '#232526', bottom: '#434343' },
-    'metropolis-sky': { top: '#2563eb', bottom: '#f43f5e' },
-    'spider-web': { top: '#be123c', bottom: '#2563eb' },
-    'arc-reactor': { top: '#f59e42', bottom: '#be123c' },
-    'gamma-rage': { top: '#22d3ee', bottom: '#a21caf' },
-    'asgard-thunder': { top: '#fbbf24', bottom: '#2563eb' },
-    'hogwarts-magic': { top: '#f59e42', bottom: '#be123c' },
-    'the-force': { top: '#2563eb', bottom: '#be123c' },
-    'matrix-code': { top: '#0f2027', bottom: '#00ff99' },
-    'chaotic-madness': { top: '#a21caf', bottom: '#22d3ee' },
-    'speed-force': { top: '#fbbf24', bottom: '#be123c' },
-    'merc-style': { top: '#be123c', bottom: '#0f172a' },
-    'amazonian-warrior': { top: '#f43f5e', bottom: '#2563eb' },
-    'star-spangled': { top: '#2563eb', bottom: '#f43f5e' },
-    'sonic-boom': { top: '#2563eb', bottom: '#fbbf24' },
-    'mushroom-kingdom': { top: '#dc2626', bottom: '#16a34a' },
+    // USDC exclusive themes with decorations
+    'gotham-city': {
+      top: '#232526',
+      bottom: '#434343',
+      decorations: ['bat-signal', 'city-silhouette']
+    },
+    'metropolis-sky': {
+      top: '#2563eb',
+      bottom: '#f43f5e',
+      decorations: ['s-symbol', 'clouds']
+    },
+    'spider-web': {
+      top: '#be123c',
+      bottom: '#2563eb',
+      decorations: ['web-pattern', 'spider']
+    },
+    'arc-reactor': {
+      top: '#f59e42',
+      bottom: '#be123c',
+      decorations: ['arc-reactor', 'tech-grid']
+    },
+    'gamma-rage': {
+      top: '#22d3ee',
+      bottom: '#a21caf',
+      decorations: ['fist', 'cracks']
+    },
+    'asgard-thunder': {
+      top: '#fbbf24',
+      bottom: '#2563eb',
+      decorations: ['hammer', 'lightning']
+    },
+    'hogwarts-magic': {
+      top: '#f59e42',
+      bottom: '#be123c',
+      decorations: ['wand', 'stars', 'castle']
+    },
+    'the-force': {
+      top: '#2563eb',
+      bottom: '#be123c',
+      decorations: ['lightsaber', 'death-star']
+    },
+    'matrix-code': {
+      top: '#0f2027',
+      bottom: '#00ff99',
+      decorations: ['green-code', 'matrix-rain']
+    },
+    'chaotic-madness': {
+      top: '#a21caf',
+      bottom: '#22d3ee',
+      decorations: ['cards', 'smile']
+    },
+    'speed-force': {
+      top: '#fbbf24',
+      bottom: '#be123c',
+      decorations: ['lightning-bolt', 'speed-lines']
+    },
+    'merc-style': {
+      top: '#be123c',
+      bottom: '#0f172a',
+      decorations: ['swords', 'logo']
+    },
+    'amazonian-warrior': {
+      top: '#f43f5e',
+      bottom: '#2563eb',
+      decorations: ['tiara', 'stars', 'lasso']
+    },
+    'star-spangled': {
+      top: '#2563eb',
+      bottom: '#f43f5e',
+      decorations: ['shield', 'star']
+    },
+    'sonic-boom': {
+      top: '#2563eb',
+      bottom: '#fbbf24',
+      decorations: ['rings', 'speed-blur']
+    },
+    'mushroom-kingdom': {
+      top: '#be123c',
+      bottom: '#22c55e',
+      decorations: ['mushroom', 'coin', 'brick']
+    },
   }
   return themeMap[theme] || themeMap['classic-pink']
 }
@@ -211,6 +276,9 @@ export default function GameScreen({ onGameOver, onVictory, soundEnabled, select
     gradient.addColorStop(1, themeColors.bottom)
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Draw theme decorations for USDC premium themes
+    drawThemeDecorations(ctx, selectedTheme, themeColors, canvas.width, canvas.height, state.cameraY)
 
     if (!state.gameStarted) {
       drawBrickPlatform(ctx, 0, 180, canvas.width, 20)
