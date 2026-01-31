@@ -17,13 +17,15 @@ interface StartScreenProps {
 
 export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggleSound }: StartScreenProps) {
   const { context } = useMiniApp();
-  const { tokens, selectedSkin, username, displayName, pfpUrl, fid } = useUserGameData(context || undefined);
+  const { tokens, selectedSkin, username, displayName, pfpUrl, fid, usdcBalance, usdcLoading, walletAddress } = useUserGameData(context || undefined);
 
   // Debug logging
   useEffect(() => {
     console.log('🎮 [StartScreen] Farcaster context:', context);
     console.log('👤 [StartScreen] User data:', { username, displayName, fid });
-  }, [context, username, displayName, fid]);
+    console.log('💰 [StartScreen] Wallet:', walletAddress);
+    console.log('💵 [StartScreen] USDC Balance:', usdcBalance);
+  }, [context, username, displayName, fid, walletAddress, usdcBalance]);
 
   return (
     <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-pink-600 via-pink-500 to-pink-600 overflow-hidden">
@@ -34,6 +36,17 @@ export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggl
         </div>
         <span className="font-black text-2xl text-[#ff69b4] min-w-[50px]">{tokens}</span>
       </div>
+      
+      {/* USDC Balance Badge */}
+      <div className="absolute top-3 right-3 flex items-center gap-2 bg-[#2a003f]/90 px-4 py-2 rounded-full border-2 border-blue-400/60 z-10 backdrop-blur-sm shadow-xl">
+        <div className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center font-black text-white text-sm">
+          💵
+        </div>
+        <span className="font-black text-2xl text-blue-400 min-w-[50px]">
+          {usdcLoading ? '...' : usdcBalance.toFixed(2)}
+        </span>
+      </div>
+      
       <div className="flex-1 flex flex-col items-center justify-center gap-3 px-4 py-16 relative z-0 w-full">
         {/* Character above the title */}
         <div className="flex items-center justify-center w-full mb-4">

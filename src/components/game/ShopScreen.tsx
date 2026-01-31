@@ -60,7 +60,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
     setSelectedSkin,
     unlockSkin,
     setTokens,
-    setUsdcBalance,
+    refetchUSDC, // Para refrescar balance después de compra
   } = useUserGameData();
 
   const [shopType, setShopType] = useState<'tokens' | 'usdc'>('tokens');
@@ -98,12 +98,12 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
         setModalType('success');
       }
     } else {
-      // Compra con USDC
+      // Compra con USDC - NO RESTA BALANCE AQUÍ
+      // El balance se actualizará automáticamente después de la transferencia blockchain
+      // Por ahora solo verifica que tenga balance
       if (usdcBalance >= selectedItem.cost) {
-        unlockSkin(selectedItem.id);
-        setUsdcBalance((prev) => prev - selectedItem.cost);
-        setSelectedSkin(selectedItem.id);
-        setModalType('success');
+        // El modal PurchaseModal manejará la transferencia real
+        setModalType('confirmation'); // Mantener en confirmación para que el modal maneje el pago
       }
     }
   };
