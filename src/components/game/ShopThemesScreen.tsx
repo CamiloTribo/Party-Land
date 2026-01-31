@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Lock } from 'lucide-react';
+import { ArrowLeft, Lock, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import { PurchaseModal } from './PurchaseModal';
@@ -66,6 +66,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
   const [tab, setTab] = useState<'tokens' | 'usdc'>('tokens');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'confirmation' | 'success'>('confirmation');
+  const [previewTheme, setPreviewTheme] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<{
     id: string;
     name: string;
@@ -231,6 +232,17 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
 
                 {/* Theme Preview */}
                 <div className={`h-24 w-full mb-2 rounded-xl relative ${theme.bg} ${!isUnlocked && 'opacity-40'}`}>
+                  {/* Preview Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPreviewTheme(theme.id);
+                    }}
+                    className="absolute top-1 left-1 z-10 bg-black/50 backdrop-blur-sm hover:bg-black/70 text-white p-1.5 rounded-lg transition-all"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </button>
+                  
                   {!isUnlocked && theme.cost > 0 && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl">
                       <Lock className="w-8 h-8 text-white" />
@@ -294,6 +306,83 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
           currentBalance={selectedItem.currency === 'tokens' ? tokens : usdcBalance}
           bgColor={selectedItem.bgColor}
         />
+      )}
+
+      {/* Theme Preview Modal */}
+      {previewTheme && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setPreviewTheme(null)}
+        >
+          <div 
+            className="relative w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(() => {
+              const theme = [...TOKEN_THEMES, ...USDC_THEMES].find(t => t.id === previewTheme);
+              if (!theme) return null;
+
+              return (
+                <div className="bg-gray-900 rounded-2xl overflow-hidden border-2 border-white/20">
+                  {/* Header */}
+                  <div className="p-4 border-b border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-white">{theme.name}</h3>
+                        <p className="text-sm text-white/60">{theme.description}</p>
+                      </div>
+                      <button
+                        onClick={() => setPreviewTheme(null)}
+                        className="text-white/60 hover:text-white"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Full Theme Preview */}
+                  <div className={`h-96 ${theme.bg} relative`}>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-6xl mb-4">🎨</div>
+                        <div className="text-white font-bold text-xl drop-shadow-lg">
+                          {theme.name}
+                        </div>
+                        <div className="text-white/80 text-sm mt-2 drop-shadow-lg">
+                          Full theme preview
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Show if theme has decorations (USDC exclusives) */}
+                    {tab === 'usdc' && (
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <div className="bg-black/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                          <div className="text-white/90 text-xs font-bold mb-1">
+                            ✨ PREMIUM THEME
+                          </div>
+                          <div className="text-white/70 text-[10px]">
+                            Includes exclusive decorations & effects
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="p-4 bg-gray-800/50">
+                    <button
+                      onClick={() => setPreviewTheme(null)}
+                      className="w-full bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-xl font-bold transition-all"
+                    >
+                      Close Preview
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
       )}
     </div>
   );

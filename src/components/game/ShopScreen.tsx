@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Lock } from 'lucide-react';
+import { ArrowLeft, Lock, Eye } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import PinkPantherPlayer from '../PinkPantherPlayer';
@@ -66,6 +66,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
   const [shopType, setShopType] = useState<'tokens' | 'usdc'>('tokens');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'confirmation' | 'success'>('confirmation');
+  const [previewSkin, setPreviewSkin] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<{
     id: string;
     name: string;
@@ -231,6 +232,17 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
 
                 {/* Skin Preview */}
                 <div className="h-20 w-full mb-2 relative flex items-center justify-center">
+                  {/* Preview Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPreviewSkin(skin.id);
+                    }}
+                    className="absolute top-0 left-0 z-10 bg-black/50 backdrop-blur-sm hover:bg-black/70 text-white p-1 rounded-lg transition-all"
+                  >
+                    <Eye className="w-3 h-3" />
+                  </button>
+
                   <div className={`transform scale-110 ${!isUnlocked && 'opacity-40'}`}>
                     <PinkPantherPlayer
                       x={0}
@@ -304,6 +316,83 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
           item={selectedItem}
           currentBalance={selectedItem.currency === 'tokens' ? tokens : usdcBalance}
         />
+      )}
+
+      {/* Skin Preview Modal */}
+      {previewSkin && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setPreviewSkin(null)}
+        >
+          <div 
+            className="relative w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(() => {
+              const skin = [...TOKEN_SKINS, ...USDC_SKINS].find(s => s.id === previewSkin);
+              if (!skin) return null;
+
+              return (
+                <div className="bg-gray-900 rounded-2xl overflow-hidden border-2 border-white/20">
+                  {/* Header */}
+                  <div className="p-4 border-b border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-white">{skin.name}</h3>
+                        <p className="text-sm text-white/60">{skin.description}</p>
+                      </div>
+                      <button
+                        onClick={() => setPreviewSkin(null)}
+                        className="text-white/60 hover:text-white"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Large Skin Preview */}
+                  <div className="bg-gradient-to-br from-purple-900 to-pink-900 h-96 relative flex items-center justify-center">
+                    <div className="transform scale-[3]">
+                      <PinkPantherPlayer
+                        x={0}
+                        y={0}
+                        isSlowed={false}
+                        isMoving={true}
+                        isFalling={false}
+                        direction="right"
+                        skin={skin.id}
+                      />
+                    </div>
+
+                    {/* Info Badge */}
+                    {shopType === 'usdc' && (
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <div className="bg-black/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                          <div className="text-white/90 text-xs font-bold mb-1">
+                            ✨ PREMIUM SKIN
+                          </div>
+                          <div className="text-white/70 text-[10px]">
+                            Exclusive USDC skin
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="p-4 bg-gray-800/50">
+                    <button
+                      onClick={() => setPreviewSkin(null)}
+                      className="w-full bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-xl font-bold transition-all"
+                    >
+                      Close Preview
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
       )}
     </div>
   );
