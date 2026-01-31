@@ -4,7 +4,11 @@ import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { Button } from '~/components/ui/Button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAccount, useSendTransaction, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
+import { parseUnits } from 'viem';
+import { PAYMENT_WALLET_ADDRESS, USDC_ADDRESS, PAYMENT_CHAIN_ID } from '~/lib/constants';
+import USDCABI from '~/abi/USDC.json';
 
 interface PurchaseModalProps {
     isOpen: boolean;
@@ -19,6 +23,7 @@ interface PurchaseModalProps {
     };
     currentBalance?: number;
     bgColor?: string; // For themes: gradient class
+    onSuccess?: () => void; // Callback después de compra exitosa
 }
 
 export const PurchaseModal = ({
@@ -29,8 +34,38 @@ export const PurchaseModal = ({
     item,
     currentBalance = 0,
     bgColor,
+    onSuccess,
 }: PurchaseModalProps) => {
     const [purchaseState, setPurchaseState] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
+    const [txHash, setTxHash] = useState<string | null>(null);
+    
+    const { address, isConnected, chainId } = useAccount();
+    const { switchChain } = useSwitchChain();
+    const { sendTransaction, isPending: isSendingTx } = useSendTransaction();
+    
+    // Monitor transaction confirmation
+    const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+        hash: txHash as `0x${string}` | undefined,
+    });
+
+    // Reset state when modal closes
+    useEffect(() => {
+        if (!isOpen) {
+            setPurchaseState('idle');
+            setTxHash(null);
+        }
+    }, [isOpen]);
+
+    // Auto-close on success
+    useEffect(() => {
+        if (isConfirmed && txHash) {
+            setPurchaseState('success');
+            onSuccess?.(); // Trigger callback (unlock skin/theme, refresh balance)
+            setTimeout(() => {
+                onClose();
+            }, 2500);
+        }
+    }, [isConfirmed, txHash, onSuccess, onClose]);
 
     if (!isOpen) return null;
 
@@ -40,29 +75,88 @@ export const PurchaseModal = ({
 
     const handleConfirm = async () => {
         setPurchaseState('pending');
+        
         try {
             if (isUSDC) {
-                // TODO: Implement USDC payment on Base when ready
-                console.log('💰 USDC Payment flow - Coming soon!');
-                alert('USDC payments coming soon! For now, use tokens.');
-                setPurchaseState('failed');
-                return;
+                // USDC Payment on Base
+                console.log('💰 Starting USDC payment...');
+                
+                if (!isConnected || !address) {
+                    alert('Please connect your wallet first!');
+                    setPurchaseState('failed');
+                    return;
+                }
+
+                // Check if we're on Base chain
+                if (chainId !== PAYMENT_CHAIN_ID) {
+                    console.log('⚠️ Wrong chain, switching to Base...');
+                    try {
+                        await switchChain?.({ chainId: PAYMENT_CHAIN_ID });
+                    } catch (err) {
+                        console.error('❌ Failed to switch chain:', err);
+                        alert('Please switch to Base network manually!');
+                        setPurchaseState('failed');
+                        return;
+                    }
+                }
+
+                // Prepare USDC transfer
+                // USDC has 6 decimals
+                const amount = parseUnits(item.cost.toString(), 6);
+                
+                console.log('[PurchaseModal] Sending USDC:', {
+                    from: address,
+                    to: PAYMENT_WALLET_ADDRESS,
+                    amount: item.cost,
+                    amountWei: amount.toString(),
+                });
+
+                // Send USDC transfer transaction
+                sendTransaction({
+                    to: USDC_ADDRESS,
+                    data: encodeFunctionData({
+                        abi: USDCABI,
+                        functionName: 'transfer',
+                        args: [PAYMENT_WALLET_ADDRESS, amount],
+                    }) as `0x${string}`,
+                }, {
+                    onSuccess: (hash) => {
+                        console.log('✅ Transaction sent:', hash);
+                        setTxHash(hash);
+                        setPurchaseState('pending'); // Wait for confirmation
+                    },
+                    onError: (error) => {
+                        console.error('❌ Transaction failed:', error);
+                        setPurchaseState('failed');
+                        setTimeout(() => setPurchaseState('idle'), 2000);
+                    },
+                });
+
+            } else {
+                // Token payment (original flow)
+                await onConfirm();
+                setPurchaseState('success');
+                setTimeout(() => {
+                    setPurchaseState('idle');
+                    onClose();
+                }, 2000);
             }
-
-            // Pago con tokens (flujo normal)
-            await onConfirm();
-            setPurchaseState('success');
-
-            setTimeout(() => {
-                setPurchaseState('idle');
-                onClose();
-            }, 2000);
         } catch (error: unknown) {
             console.error('❌ Purchase error:', error);
             setPurchaseState('failed');
             setTimeout(() => setPurchaseState('idle'), 2000);
         }
     };
+
+    // Import encodeFunctionData helper
+    function encodeFunctionData({ abi, functionName, args }: { abi: unknown; functionName: string; args: unknown[] }): string {
+        // Simple function signature encoding for ERC20 transfer
+        // transfer(address,uint256) = 0xa9059cbb
+        const functionSignature = '0xa9059cbb';
+        const addressParam = (args[0] as string).slice(2).padStart(64, '0');
+        const amountParam = (args[1] as bigint).toString(16).padStart(64, '0');
+        return `${functionSignature}${addressParam}${amountParam}`;
+    }
 
     return (
         <AnimatePresence>
@@ -124,7 +218,7 @@ export const PurchaseModal = ({
 
                             {/* Title */}
                             <h3 className={`text-3xl font-black uppercase mb-3 ${isUSDC ? 'text-blue-400' : 'text-[#ff69b4]'}`}>
-                                {type === 'success' ? 'Acquired!' : 'Confirm Purchase'}
+                                {purchaseState === 'success' || isConfirmed ? 'Acquired!' : purchaseState === 'pending' || isSendingTx || isConfirming ? 'Processing...' : 'Confirm Purchase'}
                             </h3>
 
                             {/* Item name */}
@@ -132,8 +226,39 @@ export const PurchaseModal = ({
                                 {item.name}
                             </p>
 
+                            {/* Transaction Status for USDC */}
+                            {isUSDC && (isSendingTx || isConfirming || txHash) && (
+                                <div className="w-full mb-4 p-3 bg-blue-900/30 rounded-xl border border-blue-500/30">
+                                    <div className="flex items-center gap-2 text-sm text-white">
+                                        {isSendingTx && (
+                                            <>
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                <span>Awaiting wallet approval...</span>
+                                            </>
+                                        )}
+                                        {isConfirming && !isConfirmed && (
+                                            <>
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                <span>Confirming on blockchain...</span>
+                                            </>
+                                        )}
+                                        {isConfirmed && (
+                                            <>
+                                                <span className="text-green-400">✓</span>
+                                                <span className="text-green-400">Transaction confirmed!</span>
+                                            </>
+                                        )}
+                                    </div>
+                                    {txHash && (
+                                        <div className="mt-2 text-xs text-white/60 truncate">
+                                            TX: {txHash.slice(0, 10)}...{txHash.slice(-8)}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             {/* Content section */}
-                            {type === 'confirmation' ? (
+                            {purchaseState !== 'success' && !isConfirmed ? (
                                 <div className="w-full mb-8">
                                     <div className="bg-white/5 rounded-xl px-5 py-4 border border-white/10">
                                         {/* Cost row */}
@@ -188,24 +313,25 @@ export const PurchaseModal = ({
                             )}
 
                             {/* Action Buttons */}
-                            {type === 'confirmation' ? (
+                            {purchaseState !== 'success' && !isConfirmed ? (
                                 <div className="flex gap-3 w-full">
                                     <Button
                                         onClick={onClose}
                                         variant="outline"
+                                        disabled={isSendingTx || isConfirming}
                                         className="flex-1 bg-white/5 hover:bg-white/10 text-white border-white/20"
                                     >
                                         Cancel
                                     </Button>
                                     <Button
                                         onClick={handleConfirm}
-                                        disabled={!canAfford || purchaseState === 'pending'}
+                                        disabled={!canAfford || purchaseState === 'pending' || isSendingTx || isConfirming}
                                         className={`flex-1 ${isUSDC
                                             ? 'bg-blue-600 hover:bg-blue-500'
                                             : 'bg-pink-600 hover:bg-pink-500'
                                             } text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed`}
                                     >
-                                        {purchaseState === 'pending' ? 'Processing...' : 'Confirm'}
+                                        {isSendingTx ? 'Approving...' : isConfirming ? 'Confirming...' : 'Confirm'}
                                     </Button>
                                 </div>
                             ) : (

@@ -31,24 +31,24 @@ const TOKEN_SKINS = [
   { id: 'legendary', name: 'Legendary Pink', cost: 25000, description: 'Ultimate' },
 ];
 
-// 16 USDC Exclusive Skins (superhéroes)
+// 16 USDC Exclusive Skins (superhéroes) - Price: 0.23 USDC for testing
 const USDC_SKINS = [
-  { id: 'superman', name: 'Super Pink', cost: 2.3, description: 'Faster than bullet!' },
-  { id: 'harry-potter', name: 'Wizard Potter', cost: 2.3, description: 'The boy who meowed' },
-  { id: 'batman', name: 'Dark Knight', cost: 2.3, description: "I'm Pinkman!" },
-  { id: 'spiderman', name: 'Spider Pink', cost: 2.3, description: 'Friendly hero' },
-  { id: 'iron-man', name: 'Iron Pink', cost: 2.3, description: 'Metal suit' },
-  { id: 'captain-america', name: 'Captain Pink', cost: 2.3, description: 'All day!' },
-  { id: 'thor', name: 'Pink Thunder', cost: 2.3, description: 'God of Thunder' },
-  { id: 'hulk', name: 'Pink Smash', cost: 2.3, description: 'Smash!' },
-  { id: 'wonder-woman', name: 'Wonder Pink', cost: 2.3, description: 'Amazon warrior' },
-  { id: 'flash', name: 'Flash Pink', cost: 2.3, description: 'Speedster' },
-  { id: 'deadpool', name: 'Deadpool Pink', cost: 2.3, description: 'Merc mouth' },
-  { id: 'joker', name: 'Pink Joker', cost: 2.3, description: 'Why so pink?' },
-  { id: 'luke-skywalker', name: 'Jedi Pink', cost: 2.3, description: 'May the pink' },
-  { id: 'darth-vader', name: 'Dark Lord', cost: 2.3, description: 'Your father' },
-  { id: 'mario', name: 'Mario Pink', cost: 2.3, description: "Let's-a pink!" },
-  { id: 'sonic', name: 'Sonic Pink', cost: 2.3, description: 'Gotta go pink!' },
+  { id: 'superman', name: 'Super Pink', cost: 0.23, description: 'Faster than bullet!' },
+  { id: 'harry-potter', name: 'Wizard Potter', cost: 0.23, description: 'The boy who meowed' },
+  { id: 'batman', name: 'Dark Knight', cost: 0.23, description: "I'm Pinkman!" },
+  { id: 'spiderman', name: 'Spider Pink', cost: 0.23, description: 'Friendly hero' },
+  { id: 'iron-man', name: 'Iron Pink', cost: 0.23, description: 'Metal suit' },
+  { id: 'captain-america', name: 'Captain Pink', cost: 0.23, description: 'All day!' },
+  { id: 'thor', name: 'Pink Thunder', cost: 0.23, description: 'God of Thunder' },
+  { id: 'hulk', name: 'Pink Smash', cost: 0.23, description: 'Smash!' },
+  { id: 'wonder-woman', name: 'Wonder Pink', cost: 0.23, description: 'Amazon warrior' },
+  { id: 'flash', name: 'Flash Pink', cost: 0.23, description: 'Speedster' },
+  { id: 'deadpool', name: 'Deadpool Pink', cost: 0.23, description: 'Merc mouth' },
+  { id: 'joker', name: 'Pink Joker', cost: 0.23, description: 'Why so pink?' },
+  { id: 'luke-skywalker', name: 'Jedi Pink', cost: 0.23, description: 'May the pink' },
+  { id: 'darth-vader', name: 'Dark Lord', cost: 0.23, description: 'Your father' },
+  { id: 'mario', name: 'Mario Pink', cost: 0.23, description: "Let's-a pink!" },
+  { id: 'sonic', name: 'Sonic Pink', cost: 0.23, description: 'Gotta go pink!' },
 ];
 
 export default function ShopScreen({ onBack }: ShopScreenProps) {
@@ -105,6 +105,16 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
         // El modal PurchaseModal manejará la transferencia real
         setModalType('confirmation'); // Mantener en confirmación para que el modal maneje el pago
       }
+    }
+  };
+
+  const handlePurchaseSuccess = () => {
+    // Called after successful USDC payment
+    if (selectedItem) {
+      unlockSkin(selectedItem.id);
+      setSelectedSkin(selectedItem.id);
+      refetchUSDC(); // Refresh balance from blockchain
+      setModalType('success');
     }
   };
 
@@ -289,6 +299,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           onConfirm={handleConfirmPurchase}
+          onSuccess={handlePurchaseSuccess}
           type={modalType}
           item={selectedItem}
           currentBalance={selectedItem.currency === 'tokens' ? tokens : usdcBalance}

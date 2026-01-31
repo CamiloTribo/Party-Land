@@ -33,22 +33,22 @@ const TOKEN_THEMES = [
 
 // 16 USDC Themes (superhéroes)
 const USDC_THEMES = [
-  { id: 'gotham-city', name: 'Gotham City', cost: 2.3, bg: 'bg-gradient-to-br from-[#232526] to-[#434343]', description: "Dark knight's domain" },
-  { id: 'metropolis-sky', name: 'Metropolis Sky', cost: 2.3, bg: 'bg-gradient-to-br from-[#2563eb] to-[#f43f5e]', description: 'Hope shines bright' },
-  { id: 'spider-web', name: 'Spider Web', cost: 2.3, bg: 'bg-gradient-to-br from-[#be123c] to-[#2563eb]', description: 'Swing through city' },
-  { id: 'arc-reactor', name: 'Arc Reactor', cost: 2.3, bg: 'bg-gradient-to-br from-[#f59e42] to-[#be123c]', description: 'Powered by tech' },
-  { id: 'gamma-rage', name: 'Gamma Rage', cost: 2.3, bg: 'bg-gradient-to-br from-[#22d3ee] to-[#a21caf]', description: 'Incredible strength' },
-  { id: 'asgard-thunder', name: 'Asgard Thunder', cost: 2.3, bg: 'bg-gradient-to-br from-[#fbbf24] to-[#2563eb]', description: 'Realm of gods' },
-  { id: 'hogwarts-magic', name: 'Hogwarts Magic', cost: 2.3, bg: 'bg-gradient-to-br from-[#f59e42] to-[#be123c]', description: 'Wizarding world' },
-  { id: 'the-force', name: 'The Force', cost: 2.3, bg: 'bg-gradient-to-br from-[#2563eb] to-[#be123c]', description: 'Light & dark side' },
-  { id: 'matrix-code', name: 'Matrix Code', cost: 2.3, bg: 'bg-gradient-to-br from-[#0f2027] to-[#00ff99]', description: 'Digital reality' },
-  { id: 'chaotic-madness', name: 'Chaotic Madness', cost: 2.3, bg: 'bg-gradient-to-br from-[#a21caf] to-[#22d3ee]', description: 'Why so serious?' },
-  { id: 'speed-force', name: 'Speed Force', cost: 2.3, bg: 'bg-gradient-to-br from-[#fbbf24] to-[#be123c]', description: 'Lightning fast' },
-  { id: 'merc-style', name: 'Merc Style', cost: 2.3, bg: 'bg-gradient-to-br from-[#be123c] to-[#0f172a]', description: 'Maximum effort' },
-  { id: 'amazonian-warrior', name: 'Amazonian Warrior', cost: 2.3, bg: 'bg-gradient-to-br from-[#f43f5e] to-[#2563eb]', description: 'Strength & honor' },
-  { id: 'star-spangled', name: 'Star Spangled', cost: 2.3, bg: 'bg-gradient-to-br from-[#2563eb] to-[#f43f5e]', description: 'Freedom forever' },
-  { id: 'sonic-boom', name: 'Sonic Boom', cost: 2.3, bg: 'bg-gradient-to-br from-[#2563eb] to-[#fbbf24]', description: 'Gotta go fast!' },
-  { id: 'mushroom-kingdom', name: 'Mushroom Kingdom', cost: 2.3, bg: 'bg-gradient-to-br from-[#be123c] to-[#22c55e]', description: "Let's-a-go!" },
+  { id: 'gotham-city', name: 'Gotham City', cost: 0.23, bg: 'bg-gradient-to-br from-[#232526] to-[#434343]', description: "Dark knight's domain" },
+  { id: 'metropolis-sky', name: 'Metropolis Sky', cost: 0.23, bg: 'bg-gradient-to-br from-[#2563eb] to-[#f43f5e]', description: 'Hope shines bright' },
+  { id: 'spider-web', name: 'Spider Web', cost: 0.23, bg: 'bg-gradient-to-br from-[#be123c] to-[#2563eb]', description: 'Swing through city' },
+  { id: 'arc-reactor', name: 'Arc Reactor', cost: 0.23, bg: 'bg-gradient-to-br from-[#f59e42] to-[#be123c]', description: 'Powered by tech' },
+  { id: 'gamma-rage', name: 'Gamma Rage', cost: 0.23, bg: 'bg-gradient-to-br from-[#22d3ee] to-[#a21caf]', description: 'Incredible strength' },
+  { id: 'asgard-thunder', name: 'Asgard Thunder', cost: 0.23, bg: 'bg-gradient-to-br from-[#fbbf24] to-[#2563eb]', description: 'Realm of gods' },
+  { id: 'hogwarts-magic', name: 'Hogwarts Magic', cost: 0.23, bg: 'bg-gradient-to-br from-[#f59e42] to-[#be123c]', description: 'Wizarding world' },
+  { id: 'the-force', name: 'The Force', cost: 0.23, bg: 'bg-gradient-to-br from-[#2563eb] to-[#be123c]', description: 'Light & dark side' },
+  { id: 'matrix-code', name: 'Matrix Code', cost: 0.23, bg: 'bg-gradient-to-br from-[#0f2027] to-[#00ff99]', description: 'Digital reality' },
+  { id: 'chaotic-madness', name: 'Chaotic Madness', cost: 0.23, bg: 'bg-gradient-to-br from-[#a21caf] to-[#22d3ee]', description: 'Why so serious?' },
+  { id: 'speed-force', name: 'Speed Force', cost: 0.23, bg: 'bg-gradient-to-br from-[#fbbf24] to-[#be123c]', description: 'Lightning fast' },
+  { id: 'merc-style', name: 'Merc Style', cost: 0.23, bg: 'bg-gradient-to-br from-[#be123c] to-[#0f172a]', description: 'Maximum effort' },
+  { id: 'amazonian-warrior', name: 'Amazonian Warrior', cost: 0.23, bg: 'bg-gradient-to-br from-[#f43f5e] to-[#2563eb]', description: 'Strength & honor' },
+  { id: 'star-spangled', name: 'Star Spangled', cost: 0.23, bg: 'bg-gradient-to-br from-[#2563eb] to-[#f43f5e]', description: 'Freedom forever' },
+  { id: 'sonic-boom', name: 'Sonic Boom', cost: 0.23, bg: 'bg-gradient-to-br from-[#2563eb] to-[#fbbf24]', description: 'Gotta go fast!' },
+  { id: 'mushroom-kingdom', name: 'Mushroom Kingdom', cost: 0.23, bg: 'bg-gradient-to-br from-[#be123c] to-[#22c55e]', description: "Let's-a-go!" },
 ];
 
 export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
@@ -60,7 +60,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
     setSelectedTheme,
     unlockTheme,
     setTokens,
-    setUsdcBalance,
+    refetchUSDC, // Para refrescar balance después de compra
   } = useUserGameData();
 
   const [tab, setTab] = useState<'tokens' | 'usdc'>('tokens');
@@ -99,12 +99,22 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
         setModalType('success');
       }
     } else {
+      // USDC purchase - NO RESTA BALANCE AQUÍ
+      // El balance se actualizará automáticamente después de la transferencia blockchain
+      // El modal PurchaseModal manejará la transferencia real
       if (usdcBalance >= selectedItem.cost) {
-        unlockTheme(selectedItem.id);
-        setUsdcBalance((prev) => prev - selectedItem.cost);
-        setSelectedTheme(selectedItem.id);
-        setModalType('success');
+        setModalType('confirmation'); // Mantener en confirmación para que el modal maneje el pago
       }
+    }
+  };
+
+  const handlePurchaseSuccess = () => {
+    // Called after successful USDC payment
+    if (selectedItem) {
+      unlockTheme(selectedItem.id);
+      setSelectedTheme(selectedItem.id);
+      refetchUSDC(); // Refresh balance from blockchain
+      setModalType('success');
     }
   };
 
@@ -205,17 +215,17 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
               >
                 {/* USDC Badge */}
                 {tab === 'usdc' && (
-                  <div className="absolute top-1 right-1 z-10">
+                  <div className="absolute top-2 right-2 z-10">
                     <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white/20">
                       💵 USDC
                     </div>
                   </div>
                 )}  
 
-                {/* Selected Check */}
+                {/* Selected Check - Higher z-index to appear above USDC badge */}
                 {isSelected && (
-                  <div className="absolute -top-2 -left-2 z-10 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center border-2 border-white">
-                    <span className="text-white text-xs">✓</span>
+                  <div className="absolute -top-2 -left-2 z-20 bg-green-500 rounded-full w-7 h-7 flex items-center justify-center border-2 border-white shadow-lg">
+                    <span className="text-white text-sm font-bold">✓</span>
                   </div>
                 )}
 
@@ -278,6 +288,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           onConfirm={handleConfirmPurchase}
+          onSuccess={handlePurchaseSuccess}
           type={modalType}
           item={selectedItem}
           currentBalance={selectedItem.currency === 'tokens' ? tokens : usdcBalance}
