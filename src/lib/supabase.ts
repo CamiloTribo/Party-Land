@@ -1,26 +1,39 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Avoid hardcoding keys.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-    if (typeof window === 'undefined') {
-        console.warn('⚠️ [Supabase] Missing URL or Anon Key in Node environment.');
-    }
-} else {
-    console.log('✅ [Supabase] Client configuration detected');
+// Debug keys (safe way)
+if (typeof window === 'undefined') {
+    console.log('🛡️ [Supabase Debug] URL:', supabaseUrl.substring(0, 15) + '...');
+    console.log('🛡️ [Supabase Debug] Anon Key Length:', supabaseAnonKey.length);
+    console.log('🛡️ [Supabase Debug] Service Key Length:', serviceRoleKey.length);
 }
 
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
+// Standard client (used in frontend)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Use this for backend/scripts only
+/**
+ * Service Client (used in Server Actions)
+ * We add a fallback to the Anon key if the Service key is giving issues,
+ * although Service Role is preferred for bypassing RLS.
+ */
 export const getSupabaseService = () => {
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!serviceKey) {
-        console.error('❌ [Supabase] Missing SUPABASE_SERVICE_ROLE_KEY! Backend calls will fail.');
+    // Si la clave de servicio está fallando, intentamos usar la Anon key en el servidor.
+    // En muchos casos funciona si RLS no es súper estricto.
+    const keyToUse = serviceRoleKey || supabaseAnonKey;
+
+    if (serviceRoleKey) {
+        console.log('🔑 [Supabase] Using Service Role Key');
     } else {
-        console.log('✅ [Supabase] service_role key detected');
+        console.log('⚠️ [Supabase] Service Role Key missing, falling back to Anon Key');
     }
-    return createClient(supabaseUrl || '', serviceKey || '');
+
+    return createClient(supabaseUrl, keyToUse, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+        }
+    });
 };
