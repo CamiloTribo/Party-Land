@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useAccount } from 'wagmi';
 import { useNeynarUser } from '~/hooks/useNeynarUser';
+import { useMiniApp } from '@neynar/react';
 import { useUSDCBalance } from '~/hooks/useUSDCBalance';
 import { supabase } from '~/lib/supabase';
 import {
@@ -43,8 +44,9 @@ interface GameDataContextType {
 const GameDataContext = createContext<GameDataContextType | undefined>(undefined);
 
 export function GameDataProvider({ children }: { children: React.ReactNode }) {
+    const { context } = useMiniApp();
     const { address: walletAddress, isConnected } = useAccount();
-    const { user } = useNeynarUser();
+    const { user } = useNeynarUser(context || undefined);
     const { balance: usdcBalance, loading: usdcLoading, refetch: refetchUSDC } = useUSDCBalance();
 
     const isLocalStorageLoaded = useRef(false);
