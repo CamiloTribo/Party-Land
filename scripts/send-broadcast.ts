@@ -5,16 +5,14 @@ async function sendBroadcast() {
     const title = process.argv[2] || "Message from Party Land 🎡";
     const body = process.argv[3] || "We have new updates! Come and check them out.";
 
-    console.log(`🚀 Starting broadcast...`);
+    console.log(`🚀 Starting broadcast (Anon mode)...`);
     console.log(`Message: "${title}" - "${body}"`);
 
     // Dynamically import to ensure dotenv.config() has run
-    const { getSupabaseService } = await import("../src/lib/supabase");
+    const { supabase } = await import("../src/lib/supabase");
     const { sendMiniAppNotification } = await import("../src/lib/notifs");
 
-    const supabase = getSupabaseService();
-
-    // Fetch all users with valid notification tokens
+    // Fetch all users with valid notification tokens using Anon client
     const { data: users, error } = await supabase
         .from('users')
         .select('fid, username')
@@ -22,11 +20,12 @@ async function sendBroadcast() {
 
     if (error) {
         console.error("❌ Error fetching users from Supabase:", error);
+        console.log("💡 Tip: Using Anon key. Ensure RLS allows reading 'users' table.");
         return;
     }
 
     if (!users || users.length === 0) {
-        console.log("⚠️ No users found with notifications enabled.");
+        console.log("⚠️ No users found with notifications enabled (or RLS restricted).");
         return;
     }
 
