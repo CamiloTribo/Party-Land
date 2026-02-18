@@ -10,6 +10,7 @@ import { useAccount, useSendTransaction, useWaitForTransactionReceipt, useSwitch
 import { parseUnits } from 'viem';
 import { PAYMENT_WALLET_ADDRESS, USDC_ADDRESS, PAYMENT_CHAIN_ID } from '~/lib/constants';
 import USDCABI from '~/abi/USDC.json';
+import { soundManager } from '~/lib/SoundManager';
 
 interface PurchaseModalProps {
     isOpen: boolean;
@@ -60,6 +61,7 @@ export const PurchaseModal = ({
     // Auto-close on success
     useEffect(() => {
         if (isConfirmed && txHash) {
+            soundManager.play('purchase');
             setPurchaseState('success');
             onSuccess?.(); // Trigger callback (unlock skin/theme, refresh balance)
             setTimeout(() => {
@@ -136,6 +138,7 @@ export const PurchaseModal = ({
             } else {
                 // Token payment (original flow)
                 await onConfirm();
+                soundManager.play('purchase');
                 setPurchaseState('success');
                 setTimeout(() => {
                     setPurchaseState('idle');
@@ -317,7 +320,10 @@ export const PurchaseModal = ({
                             {purchaseState !== 'success' && !isConfirmed ? (
                                 <div className="flex gap-3 w-full">
                                     <Button
-                                        onClick={onClose}
+                                        onClick={() => {
+                                            soundManager.play('click');
+                                            onClose();
+                                        }}
                                         variant="outline"
                                         disabled={isSendingTx || isConfirming}
                                         className="flex-1 bg-white/5 hover:bg-white/10 text-white border-white/20"
@@ -325,7 +331,10 @@ export const PurchaseModal = ({
                                         Cancel
                                     </Button>
                                     <Button
-                                        onClick={handleConfirm}
+                                        onClick={() => {
+                                            soundManager.play('click');
+                                            handleConfirm();
+                                        }}
                                         disabled={!canAfford || purchaseState === 'pending' || isSendingTx || isConfirming}
                                         className={`flex-1 ${isUSDC
                                             ? 'bg-blue-600 hover:bg-blue-500'
@@ -338,14 +347,20 @@ export const PurchaseModal = ({
                             ) : (
                                 <div className="flex flex-col gap-3 w-full">
                                     <Button
-                                        onClick={() => shareToFarcaster(`I just unlocked the ${item.name} skin in Party Land! Check out this amazing Farcaster game! #PartyLand #Farcaster`)}
+                                        onClick={() => {
+                                            soundManager.play('click');
+                                            shareToFarcaster(`I just unlocked the ${item.name} skin in Party Land! Check out this amazing Farcaster game! #PartyLand #Farcaster`);
+                                        }}
                                         className={`w-full ${isUSDC ? 'bg-blue-600 hover:bg-blue-500' : 'bg-[#ff69b4] hover:bg-[#ff4da6]'} text-white font-bold flex items-center justify-center gap-2`}
                                     >
                                         <Share2 className="w-5 h-5" />
                                         SHARE SKIN
                                     </Button>
                                     <Button
-                                        onClick={onClose}
+                                        onClick={() => {
+                                            soundManager.play('click');
+                                            onClose();
+                                        }}
                                         variant="outline"
                                         className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20"
                                     >

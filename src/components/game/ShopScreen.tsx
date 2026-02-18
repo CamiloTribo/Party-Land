@@ -6,6 +6,7 @@ import { useUserGameData } from '~/hooks/useUserGameData';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { useState } from 'react';
 import { PurchaseModal } from './PurchaseModal';
+import { soundManager } from '~/lib/SoundManager';
 
 interface ShopScreenProps {
   onBack: () => void;
@@ -131,7 +132,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
             <ArrowLeft className="w-6 h-6" />
             <span className="font-bold">Back</span>
           </button>
-          
+
           {/* Balance Badges */}
           <div className="flex gap-2">
             <div className="flex items-center gap-1 bg-purple-800/80 px-3 py-1.5 rounded-full border-2 border-pink-500/40">
@@ -155,26 +156,29 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
         <div className="px-4 pb-3">
           <div className="flex bg-black/20 p-1 rounded-full max-w-sm mx-auto backdrop-blur-sm border border-white/5">
             <div
-              className={`absolute inset-y-1 rounded-full transition-all duration-300 shadow-lg ${
-                shopType === 'tokens'
-                  ? 'left-1 w-[calc(50%-4px)] bg-gradient-to-r from-pink-600 to-purple-600'
-                  : 'left-[50%] w-[calc(50%-4px)] bg-gradient-to-r from-blue-600 to-cyan-600'
-              }`}
+              className={`absolute inset-y-1 rounded-full transition-all duration-300 shadow-lg ${shopType === 'tokens'
+                ? 'left-1 w-[calc(50%-4px)] bg-gradient-to-r from-pink-600 to-purple-600'
+                : 'left-[50%] w-[calc(50%-4px)] bg-gradient-to-r from-blue-600 to-cyan-600'
+                }`}
             />
             <button
-              onClick={() => setShopType('tokens')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${
-                shopType === 'tokens' ? 'text-white' : 'text-white/60'
-              }`}
+              onClick={() => {
+                soundManager.play('click');
+                setShopType('tokens');
+              }}
+              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${shopType === 'tokens' ? 'text-white' : 'text-white/60'
+                }`}
             >
               <Coins className="w-4 h-4" />
               Token Skins
             </button>
             <button
-              onClick={() => setShopType('usdc')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${
-                shopType === 'usdc' ? 'text-white' : 'text-white/60'
-              }`}
+              onClick={() => {
+                soundManager.play('click');
+                setShopType('usdc');
+              }}
+              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${shopType === 'usdc' ? 'text-white' : 'text-white/60'
+                }`}
             >
               <DollarSign className="w-4 h-4" />
               USDC Exclusives
@@ -195,6 +199,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
               <button
                 key={skin.id}
                 onClick={() => {
+                  soundManager.play('click');
                   if (isUnlocked && !isSelected) {
                     setSelectedSkin(skin.id);
                   } else if (!isUnlocked && (canAfford || skin.cost === 0)) {
@@ -204,10 +209,9 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
                 disabled={isSelected || (!isUnlocked && !canAfford && skin.cost > 0)}
                 className={`
                   relative flex flex-col items-center p-3 rounded-2xl border-2 transition-all
-                  ${
-                    isSelected
-                      ? 'border-yellow-400 shadow-xl shadow-yellow-400/20 scale-[1.02]'
-                      : shopType === 'usdc'
+                  ${isSelected
+                    ? 'border-yellow-400 shadow-xl shadow-yellow-400/20 scale-[1.02]'
+                    : shopType === 'usdc'
                       ? 'bg-blue-900/20 border-blue-500/40 hover:border-blue-400/70'
                       : 'bg-purple-800/30 border-purple-600/50 hover:border-purple-500/70'
                   }
@@ -236,6 +240,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      soundManager.play('click');
                       setPreviewSkin(skin.id);
                     }}
                     className="absolute top-0 left-0 z-10 bg-black/50 backdrop-blur-sm hover:bg-black/70 text-white p-1 rounded-lg transition-all"
@@ -271,21 +276,19 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
                 <div className="w-full">
                   {isUnlocked ? (
                     <div
-                      className={`w-full h-8 text-xs font-bold rounded-xl flex items-center justify-center ${
-                        isSelected ? 'bg-green-500 text-white' : 'bg-white/10 text-white'
-                      }`}
+                      className={`w-full h-8 text-xs font-bold rounded-xl flex items-center justify-center ${isSelected ? 'bg-green-500 text-white' : 'bg-white/10 text-white'
+                        }`}
                     >
                       {isSelected ? '✓ SELECTED' : 'SELECT'}
                     </div>
                   ) : (
                     <div
-                      className={`w-full h-8 text-xs font-bold rounded-xl flex items-center justify-center gap-1 ${
-                        canAfford || skin.cost === 0
-                          ? shopType === 'usdc'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-pink-600 text-white'
-                          : 'bg-white/5 text-white/30'
-                      }`}
+                      className={`w-full h-8 text-xs font-bold rounded-xl flex items-center justify-center gap-1 ${canAfford || skin.cost === 0
+                        ? shopType === 'usdc'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-pink-600 text-white'
+                        : 'bg-white/5 text-white/30'
+                        }`}
                     >
                       {canAfford || skin.cost === 0 ? (
                         <>
@@ -320,11 +323,11 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
 
       {/* Skin Preview Modal */}
       {previewSkin && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => setPreviewSkin(null)}
         >
-          <div 
+          <div
             className="relative w-full max-w-sm"
             onClick={(e) => e.stopPropagation()}
           >

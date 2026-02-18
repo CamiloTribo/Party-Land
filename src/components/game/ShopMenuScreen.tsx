@@ -3,6 +3,7 @@
 import { ArrowLeft, Shirt, Palette, ShoppingBag, Coins, DollarSign, Lightbulb } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
 import { useUserGameData } from '~/hooks/useUserGameData';
+import { soundManager } from '~/lib/SoundManager';
 
 interface ShopMenuScreenProps {
   onSelectSkins: () => void;
@@ -16,7 +17,7 @@ export default function ShopMenuScreen({
   onBack,
 }: ShopMenuScreenProps) {
   const { tokens, usdcBalance } = useUserGameData();
-  
+
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-purple-900 via-purple-800 to-purple-900 overflow-hidden">
       {/* Background Pattern */}
@@ -31,7 +32,10 @@ export default function ShopMenuScreen({
       <div className="relative z-10">
         <div className="flex items-center justify-between p-4">
           <button
-            onClick={onBack}
+            onClick={() => {
+              soundManager.play('click');
+              onBack();
+            }}
             className="flex items-center gap-2 text-white hover:text-pink-300 transition-colors"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -65,7 +69,10 @@ export default function ShopMenuScreen({
       <div className="relative z-10 flex flex-col gap-6 px-4 max-w-md mx-auto">
         {/* SKINS Button */}
         <button
-          onClick={onSelectSkins}
+          onClick={() => {
+            soundManager.play('click');
+            onSelectSkins();
+          }}
           className="relative group p-6 rounded-3xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border-2 border-white/20 overflow-hidden shadow-2xl"
         >
           {/* Background Gradient */}
@@ -93,7 +100,10 @@ export default function ShopMenuScreen({
 
         {/* THEMES Button */}
         <button
-          onClick={onSelectThemes}
+          onClick={() => {
+            soundManager.play('click');
+            onSelectThemes();
+          }}
           className="relative group p-6 rounded-3xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border-2 border-white/20 overflow-hidden shadow-2xl"
         >
           {/* Background Gradient */}

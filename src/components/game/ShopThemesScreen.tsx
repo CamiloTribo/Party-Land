@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import { PurchaseModal } from './PurchaseModal';
 import { drawThemeDecorations } from './ThemeDecorations';
+import { soundManager } from '~/lib/SoundManager';
 
 interface ShopThemesScreenProps {
   onBack: () => void;
@@ -67,7 +68,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
   const [tab, setTab] = useState<'tokens' | 'usdc'>('tokens');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'confirmation' | 'success'>('confirmation');
-  const [previewTheme, setPreviewTheme] = useState<string | null>(null);  const canvasRef = useRef<HTMLCanvasElement>(null);  const [selectedItem, setSelectedItem] = useState<{
+  const [previewTheme, setPreviewTheme] = useState<string | null>(null); const canvasRef = useRef<HTMLCanvasElement>(null); const [selectedItem, setSelectedItem] = useState<{
     id: string;
     name: string;
     cost: number;
@@ -125,7 +126,10 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
       <div className="sticky top-0 z-20 bg-purple-900/95 backdrop-blur-md border-b-2 border-pink-500/30">
         <div className="flex items-center justify-between p-4">
           <button
-            onClick={onBack}
+            onClick={() => {
+              soundManager.play('click');
+              onBack();
+            }}
             className="flex items-center gap-2 text-white hover:text-pink-300 transition-colors"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -155,26 +159,29 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
         <div className="px-4 pb-3">
           <div className="flex bg-black/20 p-1 rounded-full max-w-sm mx-auto backdrop-blur-sm border border-white/5 relative">
             <div
-              className={`absolute inset-y-1 rounded-full transition-all duration-300 shadow-lg ${
-                tab === 'tokens'
-                  ? 'left-1 w-[calc(50%-4px)] bg-gradient-to-r from-pink-600 to-purple-600'
-                  : 'left-[50%] w-[calc(50%-4px)] bg-gradient-to-r from-blue-600 to-cyan-600'
-              }`}
+              className={`absolute inset-y-1 rounded-full transition-all duration-300 shadow-lg ${tab === 'tokens'
+                ? 'left-1 w-[calc(50%-4px)] bg-gradient-to-r from-pink-600 to-purple-600'
+                : 'left-[50%] w-[calc(50%-4px)] bg-gradient-to-r from-blue-600 to-cyan-600'
+                }`}
             />
             <button
-              onClick={() => setTab('tokens')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${
-                tab === 'tokens' ? 'text-white' : 'text-white/60'
-              }`}
+              onClick={() => {
+                soundManager.play('click');
+                setTab('tokens');
+              }}
+              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${tab === 'tokens' ? 'text-white' : 'text-white/60'
+                }`}
             >
               <Coins className="w-4 h-4" />
               Tokens
             </button>
             <button
-              onClick={() => setTab('usdc')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${
-                tab === 'usdc' ? 'text-white' : 'text-white/60'
-              }`}
+              onClick={() => {
+                soundManager.play('click');
+                setTab('usdc');
+              }}
+              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${tab === 'usdc' ? 'text-white' : 'text-white/60'
+                }`}
             >
               <DollarSign className="w-4 h-4" />
               USDC Exclusives
@@ -195,6 +202,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
               <button
                 key={theme.id}
                 onClick={() => {
+                  soundManager.play('click');
                   if (isUnlocked && !isSelected) {
                     setSelectedTheme(theme.id);
                   } else if (!isUnlocked && (canAfford || theme.cost === 0)) {
@@ -204,10 +212,9 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                 disabled={isSelected || (!isUnlocked && !canAfford && theme.cost > 0)}
                 className={`
                   relative flex flex-col items-center p-3 rounded-2xl border-2 transition-all
-                  ${
-                    isSelected
-                      ? 'border-yellow-400 shadow-xl shadow-yellow-400/20 scale-[1.02]'
-                      : tab === 'usdc'
+                  ${isSelected
+                    ? 'border-yellow-400 shadow-xl shadow-yellow-400/20 scale-[1.02]'
+                    : tab === 'usdc'
                       ? 'border-blue-500/40 hover:border-blue-400/70'
                       : 'border-purple-600/50 hover:border-purple-500/70'
                   }
@@ -221,7 +228,7 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                       <span className="text-[10px]">$</span> USDC
                     </div>
                   </div>
-                )}  
+                )}
 
                 {/* Selected Check */}
                 {isSelected && (
@@ -236,13 +243,14 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      soundManager.play('click');
                       setPreviewTheme(theme.id);
                     }}
                     className="absolute top-1 left-1 z-10 bg-black/50 backdrop-blur-sm hover:bg-black/70 text-white p-1.5 rounded-lg transition-all"
                   >
                     <Eye className="w-3.5 h-3.5" />
                   </button>
-                  
+
                   {!isUnlocked && theme.cost > 0 && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl">
                       <Lock className="w-8 h-8 text-white" />
@@ -260,21 +268,19 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
                 <div className="w-full">
                   {isUnlocked ? (
                     <div
-                      className={`w-full h-8 text-xs font-bold rounded-xl flex items-center justify-center ${
-                        isSelected ? 'bg-green-500 text-white' : 'bg-white/10 text-white'
-                      }`}
+                      className={`w-full h-8 text-xs font-bold rounded-xl flex items-center justify-center ${isSelected ? 'bg-green-500 text-white' : 'bg-white/10 text-white'
+                        }`}
                     >
                       {isSelected ? '✓ SELECTED' : 'SELECT'}
                     </div>
                   ) : (
                     <div
-                      className={`w-full h-8 text-xs font-bold rounded-xl flex items-center justify-center gap-1 ${
-                        canAfford || theme.cost === 0
-                          ? tab === 'usdc'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-pink-600 text-white'
-                          : 'bg-white/5 text-white/30'
-                      }`}
+                      className={`w-full h-8 text-xs font-bold rounded-xl flex items-center justify-center gap-1 ${canAfford || theme.cost === 0
+                        ? tab === 'usdc'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-pink-600 text-white'
+                        : 'bg-white/5 text-white/30'
+                        }`}
                     >
                       {canAfford || theme.cost === 0 ? (
                         <>
@@ -310,11 +316,11 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
 
       {/* Theme Preview Modal */}
       {previewTheme && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => setPreviewTheme(null)}
         >
-          <div 
+          <div
             className="relative w-full max-w-sm"
             onClick={(e) => e.stopPropagation()}
           >
@@ -412,7 +418,7 @@ function ThemePreviewCanvas({ themeId, themeName, isUSDC }: { themeId: string; t
     if (!ctx) return;
 
     const themeColors = getThemeColors(themeId);
-    
+
     // Draw gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, themeColors.top);
@@ -432,7 +438,7 @@ function ThemePreviewCanvas({ themeId, themeName, isUSDC }: { themeId: string; t
     ctx.font = 'bold 24px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(themeName, canvas.width / 2, canvas.height - 40);
-    
+
     if (themeColors.decorations) {
       ctx.font = 'bold 14px sans-serif';
       ctx.fillStyle = '#fbbf24';

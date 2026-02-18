@@ -19,7 +19,8 @@
     "lint": "next lint",
     "deploy:vercel": "tsx scripts/deploy.ts",
     "deploy:raw": "vercel --prod",
-    "cleanup": "node scripts/cleanup.js"
+    "cleanup": "node scripts/cleanup.js",
+    "send-reminders": "tsx scripts/send-daily-reminders.ts"
   },
   "overrides": {
     "@walletconnect/ethereum-provider": "^2.22.0",

@@ -4,6 +4,7 @@ import { useMiniApp } from '@neynar/react';
 import { LogIn, User } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
 import { useState, useEffect } from 'react';
+import { soundManager } from '~/lib/SoundManager';
 
 interface GameAuthButtonProps {
   username?: string;
@@ -15,7 +16,7 @@ interface GameAuthButtonProps {
 export function GameAuthButton({ username, displayName, pfpUrl, fid }: GameAuthButtonProps) {
   const { context } = useMiniApp();
   const [showProfile, setShowProfile] = useState(false);
-  
+
   // If we're in Farcaster/Warpcast and user is authenticated
   const isAuthenticated = !!context?.user?.fid || !!fid;
 
@@ -35,7 +36,10 @@ export function GameAuthButton({ username, displayName, pfpUrl, fid }: GameAuthB
     return (
       <div className="relative">
         <button
-          onClick={() => setShowProfile(!showProfile)}
+          onClick={() => {
+            soundManager.play('click');
+            setShowProfile(!showProfile);
+          }}
           className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full px-4 py-2 transition-all shadow-lg border-2 border-white/40"
         >
           {pfpUrl ? (
@@ -53,7 +57,7 @@ export function GameAuthButton({ username, displayName, pfpUrl, fid }: GameAuthB
             @{username}
           </span>
         </button>
-        
+
         {/* Profile dropdown */}
         {showProfile && (
           <div className="absolute top-full mt-2 left-0 bg-purple-900/95 backdrop-blur-md rounded-2xl p-4 shadow-2xl border-2 border-white/30 min-w-[200px] z-50">
@@ -100,6 +104,7 @@ export function GameAuthButton({ username, displayName, pfpUrl, fid }: GameAuthB
         size="sm"
         className="text-xs font-bold px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-purple-900 rounded-lg flex items-center gap-2"
         onClick={() => {
+          soundManager.play('click');
           // This will only work in Warpcast/Farcaster
           if (context) {
             window.location.reload();
