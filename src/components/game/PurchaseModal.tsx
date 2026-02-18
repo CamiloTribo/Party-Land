@@ -180,7 +180,10 @@ export const PurchaseModal = ({
                             } rounded-3xl p-6 overflow-hidden`}
                     >
                         <button
-                            onClick={onClose}
+                            onClick={() => {
+                                soundManager.play('bubble');
+                                onClose();
+                            }}
                             className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors z-10"
                         >
                             <X size={24} />

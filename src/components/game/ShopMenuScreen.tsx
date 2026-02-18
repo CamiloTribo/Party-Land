@@ -48,7 +48,10 @@ export default function ShopMenuScreen({
 
           {/* Sound Toggle */}
           <button
-            onClick={onToggleSound}
+            onClick={() => {
+              onToggleSound();
+              if (!soundEnabled) soundManager.play('bubble');
+            }}
             className="w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
           >
             {soundEnabled ? (

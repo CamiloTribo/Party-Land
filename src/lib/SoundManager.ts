@@ -9,7 +9,8 @@ class SoundManager {
         this.sounds = new Map();
         if (typeof window !== 'undefined') {
             console.log('🔈 [SoundManager] Initializing sounds...');
-            this.loadSound('click', 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'); // Arcade blip
+            this.loadSound('click', 'https://assets.mixkit.co/active_storage/sfx/2808/2808-preview.mp3'); // Bubble pop
+            this.loadSound('bubble', 'https://assets.mixkit.co/active_storage/sfx/2808/2808-preview.mp3'); // Bubble pop alias
             this.loadSound('coin', 'https://assets.mixkit.co/active_storage/sfx/2635/2635-preview.mp3'); // Coin collect
             this.loadSound('victory', 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'); // Happy win
             this.loadSound('start', 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); // Game start

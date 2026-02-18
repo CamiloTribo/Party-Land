@@ -354,7 +354,10 @@ export default function ShopThemesScreen({ onBack, soundEnabled, onToggleSound }
                         <p className="text-sm text-white/60">{theme.description}</p>
                       </div>
                       <button
-                        onClick={() => setPreviewTheme(null)}
+                        onClick={() => {
+                          soundManager.play('bubble');
+                          setPreviewTheme(null);
+                        }}
                         className="text-white/60 hover:text-white transition-colors"
                       >
                         <X className="w-5 h-5" />
@@ -368,7 +371,10 @@ export default function ShopThemesScreen({ onBack, soundEnabled, onToggleSound }
                   {/* Footer */}
                   <div className="p-4 bg-gray-800/50">
                     <button
-                      onClick={() => setPreviewTheme(null)}
+                      onClick={() => {
+                        soundManager.play('bubble');
+                        setPreviewTheme(null);
+                      }}
                       className="w-full bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-xl font-bold transition-all"
                     >
                       Close Preview

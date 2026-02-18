@@ -50,7 +50,10 @@ export default function StartScreen({ onStart, onSelectGames, onOpenShop, soundE
       </div>
 
       <button
-        onClick={onToggleSound}
+        onClick={() => {
+          onToggleSound();
+          if (!soundEnabled) soundManager.play('bubble');
+        }}
         className="absolute top-3 right-3 w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
       >
         {soundEnabled ? (

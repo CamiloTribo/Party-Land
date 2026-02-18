@@ -191,8 +191,7 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
             </button>
             <button
               onClick={() => {
-                soundManager.play('click');
-                soundManager.play('click');
+                soundManager.play('bubble');
                 setShopType('usdc');
               }}
               className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${shopType === 'usdc' ? 'text-white' : 'text-white/60'
@@ -365,7 +364,10 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
                         <p className="text-sm text-white/60">{skin.description}</p>
                       </div>
                       <button
-                        onClick={() => setPreviewSkin(null)}
+                        onClick={() => {
+                          soundManager.play('bubble');
+                          setPreviewSkin(null);
+                        }}
                         className="text-white/60 hover:text-white"
                       >
                         ✕
@@ -405,7 +407,10 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
                   {/* Footer */}
                   <div className="p-4 bg-gray-800/50">
                     <button
-                      onClick={() => setPreviewSkin(null)}
+                      onClick={() => {
+                        soundManager.play('bubble');
+                        setPreviewSkin(null);
+                      }}
                       className="w-full bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-xl font-bold transition-all"
                     >
                       Close Preview
