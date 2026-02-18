@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Lock, Eye, Coins, DollarSign, ShoppingBag, Sparkles } from 'lucide-react';
+import { ArrowLeft, Lock, Eye, Coins, DollarSign, ShoppingBag, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import PinkPantherPlayer from '../PinkPantherPlayer';
@@ -10,6 +10,8 @@ import { soundManager } from '~/lib/SoundManager';
 
 interface ShopScreenProps {
   onBack: () => void;
+  soundEnabled: boolean;
+  onToggleSound: () => void;
 }
 
 // 16 Token Skins
@@ -52,7 +54,7 @@ const USDC_SKINS = [
   { id: 'sonic', name: 'Sonic Pink', cost: 2.3, description: 'Gotta go pink!' },
 ];
 
-export default function ShopScreen({ onBack }: ShopScreenProps) {
+export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: ShopScreenProps) {
   const {
     tokens,
     usdcBalance,
@@ -131,6 +133,18 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
           >
             <ArrowLeft className="w-6 h-6" />
             <span className="font-bold">Back</span>
+          </button>
+
+          {/* Sound Toggle */}
+          <button
+            onClick={onToggleSound}
+            className="w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-5 h-5 text-white" />
+            ) : (
+              <VolumeX className="w-5 h-5 text-white" />
+            )}
           </button>
 
           {/* Balance Badges */}

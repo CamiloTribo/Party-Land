@@ -10,6 +10,8 @@ import ShopScreen from "./ShopScreen";
 import ShopThemesScreen from "./ShopThemesScreen";
 import GameSelectionScreen from "./GameSelectionScreen";
 import { useUserGameData } from '~/hooks/useUserGameData';
+import { soundManager } from '~/lib/SoundManager';
+import { useEffect } from 'react';
 
 // Game state type
 type GameState = "start" | "game-selection" | "playing" | "gameover" | "victory" | "shop-menu" | "shop-skins" | "shop-themes";
@@ -19,6 +21,11 @@ export default function Game() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [finalScore, setFinalScore] = useState(0);
   const [tokensEarned, setTokensEarned] = useState(0);
+
+  // Sync with SoundManager singleton
+  useEffect(() => {
+    soundManager.toggle(soundEnabled);
+  }, [soundEnabled]);
 
   const {
     setTokens,
@@ -135,13 +142,23 @@ export default function Game() {
           onSelectSkins={handleOpenSkins}
           onSelectThemes={handleOpenThemes}
           onBack={handleCloseShop}
+          soundEnabled={soundEnabled}
+          onToggleSound={handleToggleSound}
         />
       )}
       {gameState === 'shop-skins' && (
-        <ShopScreen onBack={() => setGameState('shop-menu')} />
+        <ShopScreen
+          onBack={() => setGameState('shop-menu')}
+          soundEnabled={soundEnabled}
+          onToggleSound={handleToggleSound}
+        />
       )}
       {gameState === 'shop-themes' && (
-        <ShopThemesScreen onBack={() => setGameState('shop-menu')} />
+        <ShopThemesScreen
+          onBack={() => setGameState('shop-menu')}
+          soundEnabled={soundEnabled}
+          onToggleSound={handleToggleSound}
+        />
       )}
     </main>
   );

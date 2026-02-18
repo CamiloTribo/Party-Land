@@ -5,10 +5,6 @@ import {
 } from "@farcaster/miniapp-node";
 import { NextRequest } from "next/server";
 import { APP_NAME } from "~/lib/constants";
-import {
-  deleteUserNotificationDetails,
-  setUserNotificationDetails,
-} from "~/lib/kv";
 import { sendMiniAppNotification } from "~/lib/notifs";
 
 export async function POST(request: NextRequest) {
@@ -52,29 +48,63 @@ export async function POST(request: NextRequest) {
 
   const fid = data.fid;
   const event = data.event;
+  const { supabase } = await import("~/lib/supabase");
 
   // Only handle notifications if Neynar is not enabled
   // When Neynar is enabled, notifications are handled through their webhook
   switch (event.event) {
     case "miniapp_added":
       if (event.notificationDetails) {
-        await setUserNotificationDetails(fid, event.notificationDetails);
+        // Upsert notification details in Supabase users table
+        await supabase
+          .from('users')
+          .upsert({
+            fid,
+            notification_token: event.notificationDetails.token,
+            notification_url: event.notificationDetails.url,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'fid' });
+
         await sendMiniAppNotification({
           fid,
           title: `Welcome to ${APP_NAME}`,
           body: "Mini app is now added to your client",
         });
       } else {
-        await deleteUserNotificationDetails(fid);
+        // Remove notification details
+        await supabase
+          .from('users')
+          .update({
+            notification_token: null,
+            notification_url: null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('fid', fid);
       }
       break;
 
     case "miniapp_removed":
-      await deleteUserNotificationDetails(fid);
+      // Optional: keep user progress but clear notification token
+      await supabase
+        .from('users')
+        .update({
+          notification_token: null,
+          notification_url: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('fid', fid);
       break;
 
     case "notifications_enabled":
-      await setUserNotificationDetails(fid, event.notificationDetails);
+      await supabase
+        .from('users')
+        .upsert({
+          fid,
+          notification_token: event.notificationDetails.token,
+          notification_url: event.notificationDetails.url,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'fid' });
+
       await sendMiniAppNotification({
         fid,
         title: `Welcome to ${APP_NAME}`,
@@ -83,7 +113,14 @@ export async function POST(request: NextRequest) {
       break;
 
     case "notifications_disabled":
-      await deleteUserNotificationDetails(fid);
+      await supabase
+        .from('users')
+        .update({
+          notification_token: null,
+          notification_url: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('fid', fid);
       break;
   }
 

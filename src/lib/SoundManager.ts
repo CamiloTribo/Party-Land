@@ -12,7 +12,6 @@ class SoundManager {
             this.loadSound('coin', 'https://assets.mixkit.co/active_storage/sfx/2635/2635-preview.mp3'); // Coin collect
             this.loadSound('victory', 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'); // Happy win
             this.loadSound('start', 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); // Game start
-            this.loadSound('purchase', 'https://assets.mixkit.co/active_storage/sfx/1997/1997-preview.mp3'); // Money/Cash register
         }
     }
 
@@ -30,11 +29,17 @@ class SoundManager {
     }
 
     public play(name: string) {
-        if (!this.enabled) return;
+        if (!this.enabled) {
+            console.log(`🔇 SoundManager: ${name} skipped (muted)`);
+            return;
+        }
         const sound = this.sounds.get(name);
         if (sound) {
+            console.log(`🔊 SoundManager: playing ${name}`);
             sound.currentTime = 0;
-            sound.play().catch(err => console.log('Audio play failed:', err));
+            sound.play().catch(err => console.log(`Audio play failed (${name}):`, err));
+        } else {
+            console.warn(`⚠️ SoundManager: sound ${name} not found`);
         }
     }
 

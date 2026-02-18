@@ -61,7 +61,6 @@ export const PurchaseModal = ({
     // Auto-close on success
     useEffect(() => {
         if (isConfirmed && txHash) {
-            soundManager.play('purchase');
             setPurchaseState('success');
             onSuccess?.(); // Trigger callback (unlock skin/theme, refresh balance)
             setTimeout(() => {
@@ -138,7 +137,6 @@ export const PurchaseModal = ({
             } else {
                 // Token payment (original flow)
                 await onConfirm();
-                soundManager.play('purchase');
                 setPurchaseState('success');
                 setTimeout(() => {
                     setPurchaseState('idle');

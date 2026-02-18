@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Shirt, Palette, ShoppingBag, Coins, DollarSign, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Shirt, Palette, ShoppingBag, Coins, DollarSign, Lightbulb, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import { soundManager } from '~/lib/SoundManager';
@@ -9,12 +9,16 @@ interface ShopMenuScreenProps {
   onSelectSkins: () => void;
   onSelectThemes: () => void;
   onBack: () => void;
+  soundEnabled: boolean;
+  onToggleSound: () => void;
 }
 
 export default function ShopMenuScreen({
   onSelectSkins,
   onSelectThemes,
   onBack,
+  soundEnabled,
+  onToggleSound,
 }: ShopMenuScreenProps) {
   const { tokens, usdcBalance } = useUserGameData();
 
@@ -40,6 +44,18 @@ export default function ShopMenuScreen({
           >
             <ArrowLeft className="w-6 h-6" />
             <span className="font-bold">Back</span>
+          </button>
+
+          {/* Sound Toggle */}
+          <button
+            onClick={onToggleSound}
+            className="w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-5 h-5 text-white" />
+            ) : (
+              <VolumeX className="w-5 h-5 text-white" />
+            )}
           </button>
         </div>
 

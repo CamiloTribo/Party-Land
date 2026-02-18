@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Lock, Eye, Coins, DollarSign, Palette, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, Lock, Eye, Coins, DollarSign, Palette, Sparkles, X, Volume2, VolumeX } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import { PurchaseModal } from './PurchaseModal';
@@ -9,6 +9,8 @@ import { soundManager } from '~/lib/SoundManager';
 
 interface ShopThemesScreenProps {
   onBack: () => void;
+  soundEnabled: boolean;
+  onToggleSound: () => void;
 }
 
 // 16 Token Themes
@@ -53,7 +55,7 @@ const USDC_THEMES = [
   { id: 'mushroom-kingdom', name: 'Mushroom Kingdom', cost: 2.3, bg: 'bg-gradient-to-br from-[#be123c] to-[#22c55e]', description: "Let's-a-go!" },
 ];
 
-export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
+export default function ShopThemesScreen({ onBack, soundEnabled, onToggleSound }: ShopThemesScreenProps) {
   const {
     tokens,
     usdcBalance,
@@ -134,6 +136,18 @@ export default function ShopThemesScreen({ onBack }: ShopThemesScreenProps) {
           >
             <ArrowLeft className="w-6 h-6" />
             <span className="font-bold">Back</span>
+          </button>
+
+          {/* Sound Toggle */}
+          <button
+            onClick={onToggleSound}
+            className="w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-5 h-5 text-white" />
+            ) : (
+              <VolumeX className="w-5 h-5 text-white" />
+            )}
           </button>
 
           {/* Balance Badges */}
