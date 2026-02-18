@@ -1,9 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import { sendMiniAppNotification } from "../src/lib/notifs";
 import { APP_NAME } from "../src/lib/constants";
 import { getSupabaseService } from "../src/lib/supabase";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 async function sendDailyReminders() {
     console.log("🚀 Starting daily reminders...");
