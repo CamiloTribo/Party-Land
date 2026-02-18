@@ -78,6 +78,7 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
       if (!user?.fid || !isInitialized.current) return;
 
       try {
+        console.log(`🔄 [Supabase] Syncing data for FID: ${user.fid}...`);
         const { data: dbUser, error } = await supabase
           .from('users')
           .select('*')
@@ -90,11 +91,18 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
         }
 
         if (dbUser) {
-          // USER EXISTS: DB is the source of truth, but we merge if local has MORE items
-          console.log('[Supabase] Found existing user, syncing...', dbUser);
+          // USER EXISTS: Sync tokens with "highest value wins"
+          console.log('[Supabase] Found existing user in DB:', dbUser);
 
-          // Tokens: Use higher value or DB value? Let's use DB as source of truth for security
-          setTokens(dbUser.tokens);
+          setTokens(prev => {
+            const maxValue = Math.max(prev, dbUser.tokens || 0);
+            if (maxValue > dbUser.tokens) {
+              console.log(`📈 [Supabase] Local tokens (${prev}) > DB tokens (${dbUser.tokens}). Keeping local.`);
+            } else if (maxValue > prev) {
+              console.log(`📉 [Supabase] DB tokens (${dbUser.tokens}) > Local tokens (${prev}). Updating local.`);
+            }
+            return maxValue;
+          });
 
           // Skins: Merge local and DB
           const dbSkins = dbUser.unlocked_skins || DEFAULT_SKINS;
