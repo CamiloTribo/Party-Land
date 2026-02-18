@@ -28,13 +28,13 @@ export const APP_NAME: string = 'Party Land';
  * A brief description of the mini app's functionality.
  * Used in app store listings and metadata.
  */
-export const APP_DESCRIPTION: string = 'Play addictive mini-games on Farcaster! Collect tokens, unlock exclusive skins & themes with USDC. Your progress syncs across all games!';
+export const APP_DESCRIPTION: string = 'Play addictive mini-games on Farcaster! Collect tokens, unlock exclusive skins and themes with USDC. Your progress syncs across all games!';
 
 /**
  * The primary category for the mini app.
  * Used for app store categorization and discovery.
  */
-export const APP_PRIMARY_CATEGORY: string = 'game';
+export const APP_PRIMARY_CATEGORY: string = 'games';
 
 /**
  * Tags associated with the mini app.
@@ -111,7 +111,7 @@ export const USDC_ADDRESS: `0x${string}` = '0x833589fCD6eDb6E08f4c7C32D4f71b54bd
  * Text displayed on the main action button.
  * Used for the primary call-to-action in the mini app.
  */
-export const APP_BUTTON_TEXT: string = 'Play Now 🎮';
+export const APP_BUTTON_TEXT: string = 'Play Now';
 
 /**
  * Subtitle for the mini app (shown in app store listings).
@@ -121,7 +121,7 @@ export const APP_SUBTITLE: string = 'Arcade mini-games on Farcaster';
 /**
  * Tagline for the mini app.
  */
-export const APP_TAGLINE: string = 'Play, collect & compete on Farcaster! 🎉';
+export const APP_TAGLINE: string = 'Play collect and compete';
 
 // --- Integration Configuration ---
 /**
