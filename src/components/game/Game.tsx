@@ -33,6 +33,24 @@ export default function Game() {
     selectedTheme,
   } = useUserGameData();
 
+  // Auto-register notifications on mount
+  useEffect(() => {
+    const registerNotifs = async () => {
+      try {
+        const { sdk } = await import('@farcaster/miniapp-sdk');
+        const context = await sdk.context;
+        // Solo intentamos si estamos en una mini-app y no hemos registrado ya (idempotente por el SDK)
+        if (context) {
+          console.log('🔔 [Game] Auto-registering notifications...');
+          await sdk.actions.addFrame();
+        }
+      } catch (err) {
+        console.error('🔔 [Game] Auto-registration failed:', err);
+      }
+    };
+    registerNotifs();
+  }, []);
+
   // Handlers
   const handleSelectGames = () => {
     setGameState('game-selection');

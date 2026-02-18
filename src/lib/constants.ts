@@ -123,18 +123,11 @@ export const APP_SUBTITLE: string = 'Arcade mini-games on Farcaster';
  */
 export const APP_TAGLINE: string = 'Play collect and compete';
 
-// --- Integration Configuration ---
 /**
- * Webhook URL for receiving events from Neynar.
- *
- * If Neynar API key and client ID are configured, uses the official
- * Neynar webhook endpoint. Otherwise, falls back to a local webhook
- * endpoint for development and testing.
+ * Webhook URL for receiving events from Farcaster.
+ * Explicitly set to our local endpoint to ensure we capture tokens in Supabase.
  */
-export const APP_WEBHOOK_URL: string =
-  process.env.NEYNAR_API_KEY && process.env.NEYNAR_CLIENT_ID
-    ? `https://api.neynar.com/f/app/${process.env.NEYNAR_CLIENT_ID}/event`
-    : `${APP_URL}/api/webhook`;
+export const APP_WEBHOOK_URL: string = `${APP_URL}/api/webhook`;
 
 /**
  * Flag to enable/disable wallet functionality.

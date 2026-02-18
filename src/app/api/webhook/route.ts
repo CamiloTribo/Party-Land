@@ -8,12 +8,8 @@ import { APP_NAME } from "~/lib/constants";
 import { sendMiniAppNotification } from "~/lib/notifs";
 
 export async function POST(request: NextRequest) {
-  // If Neynar is enabled, we don't need to handle webhooks here
-  // as they will be handled by Neynar's webhook endpoint
-  const neynarEnabled = process.env.NEYNAR_API_KEY && process.env.NEYNAR_CLIENT_ID;
-  if (neynarEnabled) {
-    return Response.json({ success: true });
-  }
+  // Handle webhooks locally to store tokens in Supabase
+  console.log('📬 [Webhook] Received event at /api/webhook');
 
   const requestJson = await request.json();
 
@@ -48,6 +44,7 @@ export async function POST(request: NextRequest) {
 
   const fid = data.fid;
   const event = data.event;
+  console.log(`📬 [Webhook] Event type: ${event.event} for FID: ${fid}`);
   const { supabase } = await import("~/lib/supabase");
 
   // Only handle notifications if Neynar is not enabled
