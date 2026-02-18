@@ -64,6 +64,9 @@ export async function getFarcasterDomainManifest(): Promise<Manifest> {
       primaryCategory: APP_PRIMARY_CATEGORY,
       tags: APP_TAGS,
       tagline: APP_TAGLINE,
+      ogTitle: APP_NAME,
+      ogDescription: APP_DESCRIPTION.substring(0, 100),
+      ogImageUrl: APP_OG_IMAGE_URL,
     } as any,
   };
 }
