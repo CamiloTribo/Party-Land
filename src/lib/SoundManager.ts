@@ -9,8 +9,8 @@ class SoundManager {
         this.sounds = new Map();
         if (typeof window !== 'undefined') {
             console.log('🔈 [SoundManager] Initializing sounds...');
-            this.loadSound('click', 'https://assets.mixkit.co/active_storage/sfx/2807/2807-preview.mp3'); // Shorter bubble pop
-            this.loadSound('bubble', 'https://assets.mixkit.co/active_storage/sfx/2807/2807-preview.mp3'); // Shorter bubble pop alias
+            this.loadSound('click', 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); // Snappy blup (the one from Play Now)
+            this.loadSound('bubble', 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); // Snappy blup alias
             this.loadSound('coin', 'https://assets.mixkit.co/active_storage/sfx/2635/2635-preview.mp3'); // Coin collect
             this.loadSound('victory', 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'); // Happy win
             this.loadSound('start', 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); // Game start
