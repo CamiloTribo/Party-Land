@@ -3,7 +3,7 @@
 import { ArrowRight } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
 import { soundManager } from '~/lib/SoundManager';
-import { Volume2, VolumeX, ShoppingBag, Coins, DollarSign, Bell } from 'lucide-react';
+import { Volume2, VolumeX, ShoppingBag, Coins, DollarSign } from 'lucide-react';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import { GameAuthButton } from './GameAuthButton';
@@ -61,23 +61,6 @@ export default function StartScreen({ onStart, onSelectGames, onOpenShop, soundE
         ) : (
           <VolumeX className="w-6 h-6 text-white" />
         )}
-      </button>
-
-      <button
-        onClick={async () => {
-          console.log('🔔 [StartScreen] Requesting notification via addFrame (v0.2.2)');
-          soundManager.play('click');
-          try {
-            const sdk = (await import('@farcaster/miniapp-sdk')).sdk;
-            const result = await sdk.actions.addFrame();
-            console.log('🔔 [StartScreen] Notification result:', result);
-          } catch (err) {
-            console.error('🔔 [StartScreen] Notification error:', err);
-          }
-        }}
-        className="absolute top-16 right-3 w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
-      >
-        <Bell className="w-6 h-6 text-white" />
       </button>
 
       {/* USDC Balance Badge - Top Center */}
