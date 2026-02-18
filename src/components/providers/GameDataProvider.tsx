@@ -108,7 +108,7 @@ export function GameDataProvider({ children }: { children: React.ReactNode }) {
         if (!res.success) {
             console.error('Token sync failed, reverting...');
             setTokens(prev => prev - amount); // Revert
-        } else if (res.tokens !== undefined) {
+        } else if ('tokens' in res && res.tokens !== undefined) {
             setTokens(res.tokens); // Ensure exact sync
             localStorage.setItem('gameTokens', res.tokens.toString());
         }
