@@ -1,8 +1,9 @@
 // VictoryScreen component
 'use client';
 import { Button } from '~/components/ui/Button';
-import { Home } from 'lucide-react';
+import { Home, Share2 } from 'lucide-react';
 import PinkPantherPlayer from '../PinkPantherPlayer';
+import { shareToFarcaster } from '~/lib/utils';
 
 interface VictoryScreenProps {
   score: number;
@@ -69,9 +70,17 @@ export default function VictoryScreen({ score, tokensEarned, onRestart, onBackTo
       </div>
       <div className="flex flex-col gap-3 w-full max-w-xs z-10">
         <Button
+          onClick={() => shareToFarcaster(`🎮 I just reached floor 0 in Party Land! 🥳\n\nFinal score: ${score} floors\nTokens earned: ${tokensEarned}\n\nPlay with me on Farcaster! #PartyLand`)}
+          size="lg"
+          className="text-xl font-black px-8 py-5 bg-[#ff69b4] hover:bg-[#ff4da6] text-white rounded-2xl shadow-xl transform hover:scale-105 transition-transform flex items-center justify-center gap-2"
+        >
+          <Share2 className="w-6 h-6" />
+          SHARE WIN
+        </Button>
+        <Button
           onClick={onRestart}
           size="lg"
-          className="text-xl font-black px-8 py-5 bg-yellow-400 hover:bg-yellow-300 text-purple-900 rounded-2xl shadow-xl transform hover:scale-105 transition-transform"
+          className="text-lg font-black px-8 py-4 bg-yellow-400 hover:bg-yellow-300 text-purple-900 rounded-2xl shadow-xl"
         >
           PLAY AGAIN
         </Button>

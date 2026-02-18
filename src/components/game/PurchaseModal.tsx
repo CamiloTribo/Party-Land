@@ -1,9 +1,10 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { X, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { Button } from '~/components/ui/Button';
+import { shareToFarcaster } from '~/lib/utils';
 import { useState, useEffect } from 'react';
 import { useAccount, useSendTransaction, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
 import { parseUnits } from 'viem';
@@ -38,11 +39,11 @@ export const PurchaseModal = ({
 }: PurchaseModalProps) => {
     const [purchaseState, setPurchaseState] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
     const [txHash, setTxHash] = useState<string | null>(null);
-    
+
     const { address, isConnected, chainId } = useAccount();
     const { switchChain } = useSwitchChain();
     const { sendTransaction, isPending: isSendingTx } = useSendTransaction();
-    
+
     // Monitor transaction confirmation
     const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
         hash: txHash as `0x${string}` | undefined,
@@ -75,12 +76,12 @@ export const PurchaseModal = ({
 
     const handleConfirm = async () => {
         setPurchaseState('pending');
-        
+
         try {
             if (isUSDC) {
                 // USDC Payment on Base
                 console.log('💰 Starting USDC payment...');
-                
+
                 if (!isConnected || !address) {
                     alert('Please connect your wallet first!');
                     setPurchaseState('failed');
@@ -103,7 +104,7 @@ export const PurchaseModal = ({
                 // Prepare USDC transfer
                 // USDC has 6 decimals
                 const amount = parseUnits(item.cost.toString(), 6);
-                
+
                 console.log('[PurchaseModal] Sending USDC:', {
                     from: address,
                     to: PAYMENT_WALLET_ADDRESS,
@@ -335,12 +336,22 @@ export const PurchaseModal = ({
                                     </Button>
                                 </div>
                             ) : (
-                                <Button
-                                    onClick={onClose}
-                                    className="w-full bg-green-600 hover:bg-green-500 text-white font-bold"
-                                >
-                                    Awesome!
-                                </Button>
+                                <div className="flex flex-col gap-3 w-full">
+                                    <Button
+                                        onClick={() => shareToFarcaster(`🛍️ I just unlocked the ${item.name} skin in Party Land! 🥳\n\nCheck out this amazing Farcaster game! #PartyLand #Farcaster`)}
+                                        className={`w-full ${isUSDC ? 'bg-blue-600 hover:bg-blue-500' : 'bg-[#ff69b4] hover:bg-[#ff4da6]'} text-white font-bold flex items-center justify-center gap-2`}
+                                    >
+                                        <Share2 className="w-5 h-5" />
+                                        SHARE SKIN
+                                    </Button>
+                                    <Button
+                                        onClick={onClose}
+                                        variant="outline"
+                                        className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20"
+                                    >
+                                        Awesome!
+                                    </Button>
+                                </div>
                             )}
                         </div>
                     </motion.div>

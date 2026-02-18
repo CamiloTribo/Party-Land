@@ -72,3 +72,8 @@ export async function getFarcasterDomainManifest(): Promise<Manifest> {
     } as any,
   };
 }
+
+export function shareToFarcaster(text: string) {
+  const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(APP_URL)}`;
+  window.open(url, '_blank');
+}
