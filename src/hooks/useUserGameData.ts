@@ -1,8 +1,16 @@
+'use client';
+
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAccount } from 'wagmi';
 import { useNeynarUser } from './useNeynarUser';
 import { useUSDCBalance } from './useUSDCBalance';
 import { supabase } from '~/lib/supabase';
+import {
+  updateUserTokensAction,
+  addUnlockedSkinAction,
+  addUnlockedThemeAction,
+  updatePreferencesAction
+} from '~/app/actions/userActions';
 
 // Default values for a new user
 const DEFAULT_SKINS = ['classic'];
@@ -25,18 +33,10 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
   // Get REAL USDC balance from blockchain
   const { balance: usdcBalance, loading: usdcLoading, refetch: refetchUSDC } = useUSDCBalance();
 
-  // Debug logging
-  useEffect(() => {
-    console.log('🔍 [useUserGameData] Context:', context);
-    console.log('👤 [useUserGameData] User from Neynar:', user);
-    console.log('💰 [useUserGameData] Wallet:', walletAddress);
-    console.log('💵 [useUserGameData] USDC Balance:', usdcBalance);
-  }, [context, user, walletAddress, usdcBalance]);
-
   // Flag to track if we've loaded from localStorage
   const isInitialized = useRef(false);
 
-  // State - initialize from localStorage immediately to avoid flicker
+  // State
   const [tokens, setTokens] = useState(() => {
     if (typeof window === 'undefined') return 0;
     const saved = localStorage.getItem('gameTokens');
@@ -72,13 +72,13 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
     isInitialized.current = true;
   }, []);
 
-  // --- Supabase Sync Logic ---
+  // --- Initial Sync FROM Supabase ---
   useEffect(() => {
     async function syncData() {
       if (!user?.fid || !isInitialized.current) return;
 
       try {
-        console.log(`🔄 [Supabase] Syncing data for FID: ${user.fid}...`);
+        console.log(`🔄 [useUserGameData] Syncing data from Supabase for FID: ${user.fid}...`);
         const { data: dbUser, error } = await supabase
           .from('users')
           .select('*')
@@ -91,35 +91,21 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
         }
 
         if (dbUser) {
-          // USER EXISTS: Sync tokens with "highest value wins"
-          console.log('[Supabase] Found existing user in DB:', dbUser);
+          // USER EXISTS: DB is the source of truth for synced sessions
+          console.log('[Supabase] Found user in DB, applying server state:', dbUser);
 
-          setTokens(prev => {
-            const maxValue = Math.max(prev, dbUser.tokens || 0);
-            if (maxValue > dbUser.tokens) {
-              console.log(`📈 [Supabase] Local tokens (${prev}) > DB tokens (${dbUser.tokens}). Keeping local.`);
-            } else if (maxValue > prev) {
-              console.log(`📉 [Supabase] DB tokens (${dbUser.tokens}) > Local tokens (${prev}). Updating local.`);
-            }
-            return maxValue;
-          });
-
-          // Skins: Merge local and DB
-          const dbSkins = dbUser.unlocked_skins || DEFAULT_SKINS;
-          setUnlockedSkins((prev) => Array.from(new Set([...prev, ...dbSkins])));
+          setTokens(dbUser.tokens);
+          setUnlockedSkins(dbUser.unlocked_skins || DEFAULT_SKINS);
           setSelectedSkin(dbUser.selected_skin || DEFAULT_SKIN);
-
-          // Themes: Merge local and DB
-          const dbThemes = dbUser.unlocked_themes || DEFAULT_THEMES;
-          setUnlockedThemes((prev) => Array.from(new Set([...prev, ...dbThemes])));
+          setUnlockedThemes(dbUser.unlocked_themes || DEFAULT_THEMES);
           setSelectedTheme(dbUser.selected_theme || DEFAULT_THEME);
 
         } else {
           // NEW USER: Create in DB using current local state
-          console.log('[Supabase] New user, creating record with local data...');
+          console.log('[Supabase] New user, initializing DB with local data...');
           const { error: insertError } = await supabase
             .from('users')
-            .insert({
+            .upsert({
               fid: user.fid,
               username: user.username,
               display_name: user.display_name,
@@ -129,7 +115,7 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
               unlocked_themes: unlockedThemes,
               selected_skin: selectedSkin,
               selected_theme: selectedTheme,
-            });
+            }, { onConflict: 'fid' });
 
           if (insertError) console.error('[Supabase] Error creating user:', insertError);
         }
@@ -141,95 +127,110 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
     syncData();
   }, [user?.fid]);
 
-  // Sync state TO Supabase when it changes (Debounced potentially, but for now direct)
-  useEffect(() => {
-    async function updateDB() {
-      if (!user?.fid || !isInitialized.current) return;
+  // --- Persistence Sync TO Supabase via Server Actions ---
 
-      console.log(`💾 [Supabase] Updating user data for FID: ${user.fid}...`, { tokens });
-      const { error } = await supabase
-        .from('users')
-        .update({
-          tokens,
-          unlocked_skins: unlockedSkins,
-          unlocked_themes: unlockedThemes,
-          selected_skin: selectedSkin,
-          selected_theme: selectedTheme,
-          username: user.username,
-          display_name: user.display_name,
-          pfp_url: user.pfp_url,
-          updated_at: new Date().toISOString()
-        })
-        .eq('fid', user.fid);
-
-      if (error) {
-        console.error('❌ [Supabase] Update failed:', error);
-      } else {
-        console.log('✅ [Supabase] Update successful!');
-      }
+  const handleTokenChange = async (newTokens: number, reason: string) => {
+    if (!user?.fid) return;
+    try {
+      console.log(`💾 [useUserGameData] Syncing tokens (${newTokens}) via Server Action... Reason: ${reason}`);
+      await updateUserTokensAction(user.fid, newTokens, reason);
+    } catch (err) {
+      console.error('Failed to sync tokens to server:', err);
     }
+  };
 
-    // Only update if we are already initialized and have a user
-    const timer = setTimeout(updateDB, 1000); // Simple debounce
-    return () => clearTimeout(timer);
-  }, [tokens, unlockedSkins, unlockedThemes, selectedSkin, selectedTheme, user?.fid]);
+  const handleSkinUnlock = async (skinId: string) => {
+    if (!user?.fid) return;
+    try {
+      await addUnlockedSkinAction(user.fid, skinId);
+    } catch (err) {
+      console.error('Failed to sync skin unlock to server:', err);
+    }
+  };
 
-  // --- LocalStorage persistence (Keep as secondary for offline/fast load) ---
+  const handleThemeUnlock = async (themeId: string) => {
+    if (!user?.fid) return;
+    try {
+      await addUnlockedThemeAction(user.fid, themeId);
+    } catch (err) {
+      console.error('Failed to sync theme unlock to server:', err);
+    }
+  };
+
+  const handlePreferenceUpdate = async (prefs: { selected_skin?: string, selected_theme?: string }) => {
+    if (!user?.fid) return;
+    try {
+      await updatePreferencesAction(user.fid, prefs);
+    } catch (err) {
+      console.error('Failed to sync preferences to server:', err);
+    }
+  };
+
+  // Wrapped token setter
+  const setTokensWithSync = useCallback((val: number | ((prev: number) => number)) => {
+    setTokens(prev => {
+      const nextVal = typeof val === 'function' ? val(prev) : val;
+      if (nextVal !== prev) {
+        handleTokenChange(nextVal, nextVal > prev ? 'Earnings/Reward' : 'Spending');
+      }
+      return nextVal;
+    });
+  }, [user?.fid]);
+
+  const setSelectedSkinWithSync = useCallback((skinId: string) => {
+    setSelectedSkin(skinId);
+    handlePreferenceUpdate({ selected_skin: skinId });
+  }, [user?.fid]);
+
+  const setSelectedThemeWithSync = useCallback((themeId: string) => {
+    setSelectedTheme(themeId);
+    handlePreferenceUpdate({ selected_theme: themeId });
+  }, [user?.fid]);
+
+  const unlockSkin = useCallback((skinId: string) => {
+    setUnlockedSkins((prev) => {
+      if (prev.includes(skinId)) return prev;
+      handleSkinUnlock(skinId);
+      return [...prev, skinId];
+    });
+  }, [user?.fid]);
+
+  const unlockTheme = useCallback((themeId: string) => {
+    setUnlockedThemes((prev) => {
+      if (prev.includes(themeId)) return prev;
+      handleThemeUnlock(themeId);
+      return [...prev, themeId];
+    });
+  }, [user?.fid]);
+
+  // --- LocalStorage persistence ---
   useEffect(() => {
     if (!isInitialized.current) return;
     localStorage.setItem('gameTokens', tokens.toString());
-  }, [tokens]);
-
-  useEffect(() => {
-    if (!isInitialized.current) return;
     localStorage.setItem('unlockedSkins', JSON.stringify(unlockedSkins));
-  }, [unlockedSkins]);
-
-  useEffect(() => {
-    if (!isInitialized.current) return;
     localStorage.setItem('selectedSkin', selectedSkin);
-  }, [selectedSkin]);
-
-  useEffect(() => {
-    if (!isInitialized.current) return;
     localStorage.setItem('unlockedThemes', JSON.stringify(unlockedThemes));
-  }, [unlockedThemes]);
-
-  useEffect(() => {
-    if (!isInitialized.current) return;
     localStorage.setItem('selectedTheme', selectedTheme);
-  }, [selectedTheme]);
+  }, [tokens, unlockedSkins, selectedSkin, unlockedThemes, selectedTheme]);
 
-  // Utility functions
-  const unlockSkin = useCallback((skinId: string) => {
-    setUnlockedSkins((prev) => prev.includes(skinId) ? prev : [...prev, skinId]);
-  }, []);
-
-  const unlockTheme = useCallback((themeId: string) => {
-    setUnlockedThemes((prev) => prev.includes(themeId) ? prev : [...prev, themeId]);
-  }, []);
-
-  // Expose all state and setters
   return {
     tokens,
-    setTokens,
-    usdcBalance, // REAL balance from blockchain
+    setTokens: setTokensWithSync,
+    usdcBalance,
     usdcLoading,
     refetchUSDC,
     unlockedSkins,
     setUnlockedSkins,
     selectedSkin,
-    setSelectedSkin,
+    setSelectedSkin: setSelectedSkinWithSync,
     unlockSkin,
     unlockedThemes,
     setUnlockedThemes,
     selectedTheme,
-    setSelectedTheme,
+    setSelectedTheme: setSelectedThemeWithSync,
     unlockTheme,
-    // Wallet data from Wagmi
     walletAddress,
     isConnected,
-    // Farcaster session data
     fid: user?.fid,
     username: user?.username,
     displayName: user?.display_name,
