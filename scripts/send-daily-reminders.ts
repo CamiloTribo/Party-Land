@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({ path: ".env.local" });
 
 import { sendMiniAppNotification } from "../src/lib/notifs";
 import { APP_NAME } from "../src/lib/constants";

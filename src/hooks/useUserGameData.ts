@@ -138,7 +138,8 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
     async function updateDB() {
       if (!user?.fid || !isInitialized.current) return;
 
-      await supabase
+      console.log(`💾 [Supabase] Updating user data for FID: ${user.fid}...`, { tokens });
+      const { error } = await supabase
         .from('users')
         .update({
           tokens,
@@ -152,6 +153,12 @@ export function useUserGameData(context?: { user?: { fid?: number } }) {
           updated_at: new Date().toISOString()
         })
         .eq('fid', user.fid);
+
+      if (error) {
+        console.error('❌ [Supabase] Update failed:', error);
+      } else {
+        console.log('✅ [Supabase] Update successful!');
+      }
     }
 
     // Only update if we are already initialized and have a user
