@@ -8,10 +8,11 @@ import VictoryScreen from "./VictoryScreen";
 import ShopMenuScreen from "./ShopMenuScreen";
 import ShopScreen from "./ShopScreen";
 import ShopThemesScreen from "./ShopThemesScreen";
+import GameSelectionScreen from "./GameSelectionScreen";
 import { useUserGameData } from '~/hooks/useUserGameData';
 
 // Game state type
-type GameState = "start" | "playing" | "gameover" | "victory" | "shop-menu" | "shop-skins" | "shop-themes";
+type GameState = "start" | "game-selection" | "playing" | "gameover" | "victory" | "shop-menu" | "shop-skins" | "shop-themes";
 
 export default function Game() {
   const [gameState, setGameState] = useState<GameState>("start");
@@ -26,6 +27,18 @@ export default function Game() {
   } = useUserGameData();
 
   // Handlers
+  const handleSelectGames = () => {
+    setGameState('game-selection');
+  };
+
+  const handleSelectGame = (gameId: string) => {
+    console.log(`🎮 Selected game: ${gameId}`);
+    // Por ahora solo tenemos 100 Floor Drop
+    if (gameId === '100-floor-drop') {
+      handleStartGame();
+    }
+  };
+
   const handleStartGame = () => {
     setGameState('playing');
     setTokensEarned(0);
@@ -78,9 +91,16 @@ export default function Game() {
       {gameState === "start" && (
         <StartScreen
           onStart={handleStartGame}
+          onSelectGames={handleSelectGames}
           onOpenShop={handleOpenShop}
           soundEnabled={soundEnabled}
           onToggleSound={handleToggleSound}
+        />
+      )}
+      {gameState === 'game-selection' && (
+        <GameSelectionScreen
+          onSelectGame={handleSelectGame}
+          onBack={() => setGameState('start')}
         />
       )}
       {gameState === 'playing' && (

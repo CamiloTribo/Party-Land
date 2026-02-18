@@ -22,25 +22,25 @@ export const APP_URL: string = process.env.NEXT_PUBLIC_URL!;
  * The name of the mini app as displayed to users.
  * Used in titles, headers, and app store listings.
  */
-export const APP_NAME: string = '100 Floor Drop';
+export const APP_NAME: string = 'Party Land';
 
 /**
  * A brief description of the mini app's functionality.
  * Used in app store listings and metadata.
  */
-export const APP_DESCRIPTION: string = 'Drop through 100 floors, collect skins, and compete!';
+export const APP_DESCRIPTION: string = 'Play addictive mini-games on Farcaster! Collect tokens, unlock exclusive skins & themes with USDC. Your progress syncs across all games!';
 
 /**
  * The primary category for the mini app.
  * Used for app store categorization and discovery.
  */
-export const APP_PRIMARY_CATEGORY: string = 'social';
+export const APP_PRIMARY_CATEGORY: string = 'game';
 
 /**
  * Tags associated with the mini app.
  * Used for search and discovery in app stores.
  */
-export const APP_TAGS: string[] = ['Brutal'];
+export const APP_TAGS: string[] = ['arcade', 'casual', 'competitive', 'tokens', 'usdc'];
 
 // --- Asset URLs ---
 /**

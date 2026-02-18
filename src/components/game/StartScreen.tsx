@@ -10,12 +10,13 @@ import { useEffect } from 'react';
 
 interface StartScreenProps {
   onStart: () => void;
+  onSelectGames: () => void; // Nueva prop para ir a selección de juegos
   onOpenShop: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
 }
 
-export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggleSound }: StartScreenProps) {
+export default function StartScreen({ onStart, onSelectGames, onOpenShop, soundEnabled, onToggleSound }: StartScreenProps) {
   const { context } = useMiniApp();
   const { tokens, selectedSkin, username, displayName, pfpUrl, fid, usdcBalance, usdcLoading, walletAddress } = useUserGameData(context || undefined);
 
@@ -79,19 +80,19 @@ export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggl
         {/* Title below the character */}
         <div className="flex flex-col items-center gap-1 mb-1">
           <h1 className="text-5xl font-black text-yellow-300 leading-tight text-center drop-shadow-[0_6px_12px_rgba(0,0,0,0.6)]" style={{ textShadow: '3px 3px 0 rgba(0,0,0,0.3)' }}>
-            100 FLOOR
+            PARTY
           </h1>
           <h1 className="text-5xl font-black text-yellow-300 text-center drop-shadow-[0_6px_12px_rgba(0,0,0,0.6)]" style={{ textShadow: '3px 3px 0 rgba(0,0,0,0.3)' }}>
-            DROP
+            LAND
           </h1>
         </div>
         <p className="text-white text-base font-semibold drop-shadow-md text-center">
-          Dodge obstacles and reach floor 0!
+          Play addictive mini-games on Farcaster!
         </p>
         <div className="w-48 h-4 bg-gradient-to-b from-yellow-500 to-yellow-600 rounded-lg shadow-xl border-2 border-yellow-700" />
         <div className="flex flex-col gap-3 w-full max-w-xs mt-4 relative z-20">
           <Button
-            onClick={onStart}
+            onClick={onSelectGames}
             size="lg"
             className="text-2xl font-black px-8 py-6 bg-yellow-400 hover:bg-yellow-300 text-purple-900 rounded-2xl shadow-xl"
           >
@@ -120,8 +121,8 @@ export default function StartScreen({ onStart, onOpenShop, soundEnabled, onToggl
       
       {/* Instructions */}
       <div className="absolute bottom-4 text-center text-white/90 text-xs px-4 font-medium">
-        <p>Use the buttons to move ← →</p>
-        <p className="mt-0.5">Find the gaps in each floor!</p>
+        <p>🎮 Multiple games, one progression!</p>
+        <p className="mt-0.5">Coins, skins & themes sync across all games</p>
       </div>
     </div>
   )
