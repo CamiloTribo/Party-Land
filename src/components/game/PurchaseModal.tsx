@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Share2 } from 'lucide-react';
+import { X, Share2, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { Button } from '~/components/ui/Button';
@@ -267,9 +267,9 @@ export const PurchaseModal = ({
                                             <span>Cost</span>
                                             <div className="flex items-center gap-2 font-bold text-white">
                                                 {isUSDC ? (
-                                                    <><span className="text-2xl">💵</span> <span>{item.cost} USDC</span></>
+                                                    <><div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-[10px] border border-blue-500/40">U</div> <span>{item.cost} USDC</span></>
                                                 ) : (
-                                                    <><span className="text-2xl">🪙</span> <span>{item.cost}</span></>
+                                                    <><div className="w-6 h-6 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-300 font-bold border border-yellow-500/40"><Coins className="w-3 h-3" /></div> <span>{item.cost}</span></>
                                                 )}
                                             </div>
                                         </div>
@@ -281,9 +281,9 @@ export const PurchaseModal = ({
                                             <span>Your Balance</span>
                                             <div className="flex items-center gap-2 font-bold text-white">
                                                 {isUSDC ? (
-                                                    <><span className="text-2xl">💵</span> <span>{currentBalance} USDC</span></>
+                                                    <><div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-[10px] border border-blue-500/40">U</div> <span>{currentBalance} USDC</span></>
                                                 ) : (
-                                                    <><span className="text-2xl">🪙</span> <span>{currentBalance}</span></>
+                                                    <><div className="w-6 h-6 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-300 font-bold border border-yellow-500/40"><Coins className="w-3 h-3" /></div> <span>{currentBalance}</span></>
                                                 )}
                                             </div>
                                         </div>
@@ -295,9 +295,9 @@ export const PurchaseModal = ({
                                             <span>After Purchase</span>
                                             <div className={`flex items-center gap-2 font-bold ${canAfford ? 'text-green-400' : 'text-red-400'}`}>
                                                 {isUSDC ? (
-                                                    <><span className="text-2xl">💵</span> <span>{Math.max(0, remainingBalance).toFixed(2)} USDC</span></>
+                                                    <><div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-[10px] border border-blue-500/40">U</div> <span>{Math.max(0, remainingBalance).toFixed(2)} USDC</span></>
                                                 ) : (
-                                                    <><span className="text-2xl">🪙</span> <span>{Math.max(0, remainingBalance)}</span></>
+                                                    <><div className="w-6 h-6 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-300 font-bold border border-yellow-500/40"><Coins className="w-3 h-3" /></div> <span>{Math.max(0, remainingBalance)}</span></>
                                                 )}
                                             </div>
                                         </div>
@@ -338,7 +338,7 @@ export const PurchaseModal = ({
                             ) : (
                                 <div className="flex flex-col gap-3 w-full">
                                     <Button
-                                        onClick={() => shareToFarcaster(`🛍️ I just unlocked the ${item.name} skin in Party Land! 🥳\n\nCheck out this amazing Farcaster game! #PartyLand #Farcaster`)}
+                                        onClick={() => shareToFarcaster(`I just unlocked the ${item.name} skin in Party Land! Check out this amazing Farcaster game! #PartyLand #Farcaster`)}
                                         className={`w-full ${isUSDC ? 'bg-blue-600 hover:bg-blue-500' : 'bg-[#ff69b4] hover:bg-[#ff4da6]'} text-white font-bold flex items-center justify-center gap-2`}
                                     >
                                         <Share2 className="w-5 h-5" />
@@ -355,8 +355,8 @@ export const PurchaseModal = ({
                             )}
                         </div>
                     </motion.div>
-                </div>
+                </div >
             )}
-        </AnimatePresence>
+        </AnimatePresence >
     );
 };

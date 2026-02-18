@@ -1,7 +1,7 @@
 // VictoryScreen component
 'use client';
 import { Button } from '~/components/ui/Button';
-import { Home, Share2 } from 'lucide-react';
+import { Home, Share2, Coins } from 'lucide-react';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { shareToFarcaster } from '~/lib/utils';
 
@@ -61,7 +61,7 @@ export default function VictoryScreen({ score, tokensEarned, onRestart, onBackTo
             <p className="text-yellow-400 text-base mb-2 font-bold">Tokens Earned</p>
             <div className="flex items-center justify-center gap-2">
               <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center font-black text-purple-900 text-base">
-                🪙
+                <Coins className="w-4 h-4" />
               </div>
               <p className="text-4xl font-black text-yellow-300 drop-shadow-lg">+{tokensEarned}</p>
             </div>
@@ -70,7 +70,7 @@ export default function VictoryScreen({ score, tokensEarned, onRestart, onBackTo
       </div>
       <div className="flex flex-col gap-3 w-full max-w-xs z-10">
         <Button
-          onClick={() => shareToFarcaster(`🎮 I just reached floor 0 in Party Land! 🥳\n\nFinal score: ${score} floors\nTokens earned: ${tokensEarned}\n\nPlay with me on Farcaster! #PartyLand`)}
+          onClick={() => shareToFarcaster(`I just reached floor 0 in Party Land! Final score: ${score} floors. Tokens earned: ${tokensEarned}. Play with me on Farcaster! #PartyLand`)}
           size="lg"
           className="text-xl font-black px-8 py-5 bg-[#ff69b4] hover:bg-[#ff4da6] text-white rounded-2xl shadow-xl transform hover:scale-105 transition-transform flex items-center justify-center gap-2"
         >

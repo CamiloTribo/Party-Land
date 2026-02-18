@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Gamepad2, Lock } from 'lucide-react';
+import { ArrowLeft, Gamepad2, Lock, Sparkles } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
 
 interface Game {
@@ -73,25 +73,25 @@ export default function GameSelectionScreen({ onSelectGame, onBack }: GameSelect
 
         <div className="flex -space-x-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="w-8 h-8 rounded-full border-2 border-purple-500 bg-purple-900 flex items-center justify-center text-xs">
-              {['🎮', '🎯', '✨'][i]}
+            <div key={i} className="w-8 h-8 rounded-full border-2 border-purple-500 bg-purple-900 flex items-center justify-center text-xs text-white">
+              {[<Gamepad2 key="1" className="w-4 h-4" />, <Gamepad2 key="2" className="w-4 h-4" />, <Sparkles key="3" className="w-4 h-4" />][i]}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Title Section */}
-      <div className="relative z-10 px-6 pb-10 pt-2 flex flex-col items-center">
-        <div className="relative mb-2">
-          <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-yellow-500 rounded-full blur opacity-50"></div>
-          <Gamepad2 className="w-12 h-12 text-yellow-300 relative" />
+      {/* Title Section - Using Official Logo */}
+      <div className="relative z-10 px-6 pb-8 pt-2 flex flex-col items-center">
+        <div className="relative mb-2 w-full max-w-[280px]">
+          <img
+            src="/logo sin fondo party land.png"
+            alt="Party Land"
+            className="w-full h-auto drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+          />
         </div>
-        <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-yellow-400 to-yellow-600 text-center drop-shadow-xl uppercase tracking-tighter">
-          The Games
-        </h1>
-        <div className="h-1 w-20 bg-gradient-to-r from-pink-500 to-yellow-500 rounded-full mt-2" />
-        <p className="text-white/70 text-center text-sm font-medium mt-3 italic">
-          "All your progress, in every world"
+        <div className="h-0.5 w-24 bg-gradient-to-r from-pink-500/50 via-yellow-500/50 to-pink-500/50 rounded-full mt-4" />
+        <p className="text-white/70 text-center text-xs font-semibold mt-4 tracking-widest uppercase italic">
+          Choose Your Game
         </p>
       </div>
 
@@ -112,23 +112,29 @@ export default function GameSelectionScreen({ onSelectGame, onBack }: GameSelect
           >
             {/* Content */}
             <div className="relative flex items-center gap-5 z-10">
-              {/* Icon Container */}
+              {/* Icon Container - Using Official Game Logo if available */}
               <div className={`
-                w-20 h-20 rounded-[1.8rem] backdrop-blur-xl border-2 shadow-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-500 group-hover:rotate-6
+                w-24 h-24 rounded-[2rem] backdrop-blur-xl border-2 shadow-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-500 group-hover:rotate-3
                 ${game.available
-                  ? 'bg-gradient-to-br from-pink-500/20 to-purple-600/20 border-white/30'
-                  : 'bg-white/5 border-white/10'
+                  ? 'bg-white/5 border-white/30'
+                  : 'bg-white/2 border-white/10'
                 }
               `}>
-                <div className="text-4xl drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
-                  {game.available ? game.icon : <Lock className="w-10 h-10 text-white/20" />}
-                </div>
+                {game.available ? (
+                  <img
+                    src="/LOGO 100 FLOOR.png"
+                    alt={game.name}
+                    className="w-[85%] h-[85%] object-contain drop-shadow-lg"
+                  />
+                ) : (
+                  <Lock className="w-10 h-10 text-white/20" />
+                )}
               </div>
 
               {/* Text Info */}
               <div className="flex flex-col text-left flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xl font-black text-white tracking-tight truncate">
+                  <span className="text-xl font-black text-white tracking-tight truncate uppercase">
                     {game.name}
                   </span>
                   {game.comingSoon && (
