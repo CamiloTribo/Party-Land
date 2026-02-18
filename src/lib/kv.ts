@@ -9,9 +9,9 @@ const localStore = new Map<string, MiniAppNotificationDetails>();
 const useRedis = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN;
 const redis = useRedis
   ? new Redis({
-      url: process.env.KV_REST_API_URL!,
-      token: process.env.KV_REST_API_TOKEN!,
-    })
+    url: process.env.KV_REST_API_URL!,
+    token: process.env.KV_REST_API_TOKEN!,
+  })
   : null;
 
 function getUserNotificationDetailsKey(fid: number): string {
@@ -49,4 +49,16 @@ export async function deleteUserNotificationDetails(
   } else {
     localStore.delete(key);
   }
+}
+
+export async function listAllUserNotificationFids(): Promise<number[]> {
+  const pattern = `${APP_NAME}:user:*`;
+  if (redis) {
+    const keys = await redis.keys(pattern);
+    return keys.map(key => parseInt(key.split(':').pop() || '0')).filter(fid => fid !== 0);
+  }
+  return Array.from(localStore.keys())
+    .filter(key => key.startsWith(`${APP_NAME}:user:`))
+    .map(key => parseInt(key.split(':').pop() || '0'))
+    .filter(fid => fid !== 0);
 }

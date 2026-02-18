@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Gamepad2, Lock, Sparkles } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
+import { soundManager } from '~/lib/SoundManager';
 
 interface Game {
   id: string;
@@ -17,14 +18,14 @@ const GAMES: Game[] = [
     id: '100-floor-drop',
     name: '100 Floor Drop',
     description: 'Descend 100 floors in this addictive arcade game!',
-    icon: '🎯',
+    icon: 'target',
     available: true,
   },
   {
     id: 'party-race',
     name: 'Party Race',
     description: 'Race against friends in crazy obstacle courses!',
-    icon: '🏁',
+    icon: 'flag',
     available: false,
     comingSoon: true,
   },
@@ -32,7 +33,7 @@ const GAMES: Game[] = [
     id: 'token-hunter',
     name: 'Token Hunter',
     description: 'Collect tokens in this fast-paced adventure!',
-    icon: '💎',
+    icon: 'diamond',
     available: false,
     comingSoon: true,
   },
@@ -45,7 +46,7 @@ interface GameSelectionScreenProps {
 
 export default function GameSelectionScreen({ onSelectGame, onBack }: GameSelectionScreenProps) {
   return (
-    <div className="fixed inset-0 bg-[#2d0050] overflow-hidden">
+    <div className="fixed inset-0 bg-[#2d0050] overflow-y-auto">
       {/* Dynamic Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#ff69b4_0%,transparent_50%)] opacity-20" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,#7c3aed_0%,transparent_50%)] opacity-20" />
@@ -64,7 +65,10 @@ export default function GameSelectionScreen({ onSelectGame, onBack }: GameSelect
       {/* Header */}
       <div className="relative z-10 p-5 flex items-center justify-between">
         <button
-          onClick={onBack}
+          onClick={() => {
+            soundManager.play('click');
+            onBack();
+          }}
           className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md px-4 py-2 rounded-xl text-white transition-all border border-white/20 shadow-lg"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -100,7 +104,10 @@ export default function GameSelectionScreen({ onSelectGame, onBack }: GameSelect
         {GAMES.map((game) => (
           <button
             key={game.id}
-            onClick={() => game.available && onSelectGame(game.id)}
+            onClick={() => {
+              soundManager.play('click');
+              game.available && onSelectGame(game.id);
+            }}
             disabled={!game.available}
             className={`
               relative group p-5 rounded-[2.5rem] transition-all duration-300 border-2 overflow-hidden shadow-2xl

@@ -1,6 +1,8 @@
 'use client'
 
+import { ArrowRight } from 'lucide-react';
 import { Button } from '~/components/ui/Button';
+import { soundManager } from '~/lib/SoundManager';
 import { Volume2, VolumeX, ShoppingBag, Coins, DollarSign } from 'lucide-react';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { useUserGameData } from '~/hooks/useUserGameData';
@@ -91,14 +93,20 @@ export default function StartScreen({ onStart, onSelectGames, onOpenShop, soundE
 
         <div className="flex flex-col gap-3 w-full max-w-xs mt-2 relative z-20">
           <Button
-            onClick={onSelectGames}
+            onClick={() => {
+              soundManager.play('start');
+              onSelectGames();
+            }}
             size="lg"
             className="text-2xl font-black px-8 py-7 bg-yellow-400 hover:bg-yellow-300 text-purple-900 rounded-2xl shadow-[0_8px_0_rgb(161,98,7)] active:translate-y-1 active:shadow-none transition-all"
           >
             PLAY NOW
           </Button>
           <Button
-            onClick={onOpenShop}
+            onClick={() => {
+              soundManager.play('click');
+              onOpenShop();
+            }}
             size="lg"
             className="text-xl font-black px-8 py-4 bg-pink-600 hover:bg-pink-500 text-white rounded-2xl shadow-[0_6px_0_rgb(157,23,77)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2"
           >

@@ -2,6 +2,8 @@
 'use client';
 import { Button } from '~/components/ui/Button';
 import { Home, Share2, Coins } from 'lucide-react';
+import { useEffect } from 'react';
+import { soundManager } from '~/lib/SoundManager';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { shareToFarcaster } from '~/lib/utils';
 
@@ -14,6 +16,10 @@ interface VictoryScreenProps {
 }
 
 export default function VictoryScreen({ score, tokensEarned, onRestart, onBackToMenu, selectedSkin }: VictoryScreenProps) {
+  useEffect(() => {
+    soundManager.play('victory');
+  }, []);
+
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center px-4 py-8 bg-gradient-to-b from-yellow-400 via-pink-500 to-purple-600 overflow-hidden">
       {/* Confetti effect */}

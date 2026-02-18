@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import sdk from '@farcaster/miniapp-sdk';
 import { Manifest } from '@farcaster/miniapp-core/src/manifest';
 import {
   APP_BUTTON_TEXT,
@@ -59,7 +60,6 @@ export async function getFarcasterDomainManifest(): Promise<Manifest> {
       splashImageUrl: APP_SPLASH_URL,
       splashBackgroundColor: APP_SPLASH_BACKGROUND_COLOR,
       webhookUrl: APP_WEBHOOK_URL,
-      subtitle: APP_SUBTITLE,
       description: APP_DESCRIPTION,
       primaryCategory: APP_PRIMARY_CATEGORY,
       tags: APP_TAGS,
@@ -75,5 +75,7 @@ export async function getFarcasterDomainManifest(): Promise<Manifest> {
 
 export function shareToFarcaster(text: string) {
   const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(APP_URL)}`;
-  window.open(url, '_blank');
+  if (typeof window !== 'undefined') {
+    sdk.actions.openUrl({ url });
+  }
 }
