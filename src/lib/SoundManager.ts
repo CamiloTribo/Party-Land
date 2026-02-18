@@ -8,6 +8,7 @@ class SoundManager {
     private constructor() {
         this.sounds = new Map();
         if (typeof window !== 'undefined') {
+            console.log('🔈 [SoundManager] Initializing sounds...');
             this.loadSound('click', 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'); // Arcade blip
             this.loadSound('coin', 'https://assets.mixkit.co/active_storage/sfx/2635/2635-preview.mp3'); // Coin collect
             this.loadSound('victory', 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'); // Happy win

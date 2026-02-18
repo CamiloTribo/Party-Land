@@ -218,8 +218,10 @@ export default function ShopThemesScreen({ onBack, soundEnabled, onToggleSound }
                 onClick={() => {
                   soundManager.play('click');
                   if (isUnlocked && !isSelected) {
+                    soundManager.play('click');
                     setSelectedTheme(theme.id);
                   } else if (!isUnlocked && (canAfford || theme.cost === 0)) {
+                    soundManager.play('click');
                     handlePurchaseClick(theme);
                   }
                 }}

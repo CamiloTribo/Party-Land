@@ -1,6 +1,5 @@
 import {
   SendNotificationRequest,
-  sendNotificationResponseSchema,
 } from "@farcaster/miniapp-sdk";
 import { supabase } from "./supabase";
 import { APP_URL } from "./constants";
@@ -57,17 +56,6 @@ export async function sendMiniAppNotification({
   const responseJson = await response.json();
 
   if (response.status === 200) {
-    const responseBody = sendNotificationResponseSchema.safeParse(responseJson);
-    if (responseBody.success === false) {
-      // Malformed response
-      return { state: "error", error: responseBody.error.errors };
-    }
-
-    if (responseBody.data.result.rateLimitedTokens.length) {
-      // Rate limited
-      return { state: "rate_limit" };
-    }
-
     return { state: "success" };
   } else {
     // Error response

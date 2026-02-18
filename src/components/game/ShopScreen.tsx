@@ -128,7 +128,10 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
       <div className="sticky top-0 z-20 bg-purple-900/95 backdrop-blur-md border-b-2 border-pink-500/30">
         <div className="flex items-center justify-between p-4">
           <button
-            onClick={onBack}
+            onClick={() => {
+              soundManager.play('click');
+              onBack();
+            }}
             className="flex items-center gap-2 text-white hover:text-pink-300 transition-colors"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -189,6 +192,7 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
             <button
               onClick={() => {
                 soundManager.play('click');
+                soundManager.play('click');
                 setShopType('usdc');
               }}
               className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-colors ${shopType === 'usdc' ? 'text-white' : 'text-white/60'
@@ -215,8 +219,10 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
                 onClick={() => {
                   soundManager.play('click');
                   if (isUnlocked && !isSelected) {
+                    soundManager.play('click');
                     setSelectedSkin(skin.id);
                   } else if (!isUnlocked && (canAfford || skin.cost === 0)) {
+                    soundManager.play('click');
                     handlePurchaseClick(skin);
                   }
                 }}
