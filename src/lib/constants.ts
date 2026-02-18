@@ -65,7 +65,7 @@ export const APP_SPLASH_URL: string = `${APP_URL}/splash.png`;
  * Background color for the splash screen.
  * Used as fallback when splash image is loading.
  */
-export const APP_SPLASH_BACKGROUND_COLOR: string = '#f7f7f7';
+export const APP_SPLASH_BACKGROUND_COLOR: string = '#2d0050';
 
 /**
  * Account association for the mini app.
@@ -111,7 +111,17 @@ export const USDC_ADDRESS: `0x${string}` = '0x833589fCD6eDb6E08f4c7C32D4f71b54bd
  * Text displayed on the main action button.
  * Used for the primary call-to-action in the mini app.
  */
-export const APP_BUTTON_TEXT: string = 'Launch Mini App';
+export const APP_BUTTON_TEXT: string = 'Play Now 🎮';
+
+/**
+ * Subtitle for the mini app (shown in app store listings).
+ */
+export const APP_SUBTITLE: string = 'Arcade mini-games on Farcaster';
+
+/**
+ * Tagline for the mini app.
+ */
+export const APP_TAGLINE: string = 'Play, collect & compete on Farcaster! 🎉';
 
 // --- Integration Configuration ---
 /**

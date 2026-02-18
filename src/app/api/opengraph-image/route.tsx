@@ -1,25 +1,68 @@
 import { ImageResponse } from "next/og";
-import { NextRequest } from "next/server";
-import { getNeynarUser } from "~/lib/neynar";
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const fid = searchParams.get('fid');
-
-  const user = fid ? await getNeynarUser(Number(fid)) : null;
-
+export async function GET() {
   return new ImageResponse(
     (
-      <div tw="flex h-full w-full flex-col justify-center items-center relative bg-primary">
-        {user?.pfp_url && (
-          <div tw="flex w-96 h-96 rounded-full overflow-hidden mb-8 border-8 border-white">
-            <img src={user.pfp_url} alt="Profile" tw="w-full h-full object-cover" />
+      <div
+        tw="flex h-full w-full flex-col justify-center items-center"
+        style={{
+          background: 'linear-gradient(135deg, #1a0030 0%, #2d0050 40%, #4a0080 70%, #6b00b0 100%)',
+          fontFamily: 'sans-serif',
+        }}
+      >
+        {/* Background sparkles effect */}
+        <div
+          tw="absolute inset-0"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,105,180,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(100,0,200,0.2) 0%, transparent 50%)',
+          }}
+        />
+
+        {/* Logo */}
+        <div tw="flex flex-col items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://party-land.vercel.app/icon.png"
+            alt="Party Land"
+            tw="w-48 h-48 mb-6"
+            style={{ borderRadius: '24px' }}
+          />
+
+          {/* Title */}
+          <div
+            tw="text-8xl font-black text-white text-center mb-4"
+            style={{
+              textShadow: '0 0 40px rgba(255,105,180,0.8), 0 4px 8px rgba(0,0,0,0.5)',
+              letterSpacing: '-2px',
+            }}
+          >
+            PARTY LAND
           </div>
-        )}
-        <h1 tw="text-8xl text-white">{user?.display_name ? `Hello from ${user.display_name ?? user.username}!` : 'Hello!'}</h1>
-        <p tw="text-5xl mt-4 text-white opacity-80">Powered by Neynar 🪐</p>
+
+          {/* Subtitle */}
+          <div
+            tw="text-3xl font-semibold text-center"
+            style={{ color: '#ff69b4' }}
+          >
+            🎮 Arcade mini-games on Farcaster
+          </div>
+
+          {/* Tags */}
+          <div tw="flex flex-row gap-4 mt-6">
+            {['Arcade', 'Casual', 'Competitive', 'USDC'].map((tag) => (
+              <div
+                key={tag}
+                tw="px-4 py-2 rounded-full text-white text-xl font-bold"
+                style={{ background: 'rgba(255,105,180,0.3)', border: '1px solid rgba(255,105,180,0.5)' }}
+              >
+                {tag}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     ),
     {
