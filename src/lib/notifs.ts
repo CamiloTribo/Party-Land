@@ -2,14 +2,14 @@ import {
   SendNotificationRequest,
   sendNotificationResponseSchema,
 } from "@farcaster/miniapp-sdk";
-import { getUserNotificationDetails } from "~/lib/kv";
+import { supabase } from "./supabase";
 import { APP_URL } from "./constants";
 
 type SendMiniAppNotificationResult =
   | {
-      state: "error";
-      error: unknown;
-    }
+    state: "error";
+    error: unknown;
+  }
   | { state: "no_token" }
   | { state: "rate_limit" }
   | { state: "success" };
@@ -23,10 +23,22 @@ export async function sendMiniAppNotification({
   title: string;
   body: string;
 }): Promise<SendMiniAppNotificationResult> {
-  const notificationDetails = await getUserNotificationDetails(fid);
-  if (!notificationDetails) {
+  // Fetch notification details from Supabase
+  const { data: user, error } = await supabase
+    .from('users')
+    .select('notification_token, notification_url')
+    .eq('fid', fid)
+    .single();
+
+  if (error || !user?.notification_token || !user?.notification_url) {
+    console.error(`[Notifs] No token for FID ${fid}:`, error);
     return { state: "no_token" };
   }
+
+  const notificationDetails = {
+    token: user.notification_token,
+    url: user.notification_url,
+  };
 
   const response = await fetch(notificationDetails.url, {
     method: "POST",
