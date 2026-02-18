@@ -22,6 +22,7 @@ export default function AnimatedObstacle({ x, y, type, direction = 1 }: Animated
           transform: direction < 0 ? 'scaleX(-1)' : 'scaleX(1)',
         }}
       >
+
         <svg width="40" height="50" viewBox="0 0 40 50" className="drop-shadow-lg">
           {/* Legs */}
           <line x1="16" y1="42" x2="16" y2="50" stroke="#000" strokeWidth="3" />
