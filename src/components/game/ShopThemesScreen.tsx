@@ -61,10 +61,9 @@ export default function ShopThemesScreen({ onBack, soundEnabled, onToggleSound }
     usdcBalance,
     unlockedThemes,
     selectedTheme,
-    setSelectedTheme,
-    unlockTheme,
-    setTokens,
-    refetchUSDC, // Para refrescar balance después de compra
+    selectTheme,
+    buyTheme,
+    refetchUSDC,
   } = useUserGameData();
 
   const [tab, setTab] = useState<'tokens' | 'usdc'>('tokens');
@@ -97,10 +96,15 @@ export default function ShopThemesScreen({ onBack, soundEnabled, onToggleSound }
 
     if (selectedItem.currency === 'tokens') {
       if (tokens >= selectedItem.cost) {
-        unlockTheme(selectedItem.id);
-        setTokens((prev) => prev - selectedItem.cost);
-        setSelectedTheme(selectedItem.id);
-        setModalType('success');
+        buyTheme(selectedItem.id, selectedItem.cost).then(success => {
+          if (success) {
+            selectTheme(selectedItem.id);
+            setModalType('success');
+          } else {
+            alert('Purchase failed. Please try again.');
+            setModalOpen(false);
+          }
+        });
       }
     } else {
       // USDC purchase - NO RESTA BALANCE AQUÍ
@@ -115,10 +119,11 @@ export default function ShopThemesScreen({ onBack, soundEnabled, onToggleSound }
   const handlePurchaseSuccess = () => {
     // Called after successful USDC payment
     if (selectedItem) {
-      unlockTheme(selectedItem.id);
-      setSelectedTheme(selectedItem.id);
-      refetchUSDC(); // Refresh balance from blockchain
-      setModalType('success');
+      buyTheme(selectedItem.id, 0).then(() => {
+        selectTheme(selectedItem.id);
+        refetchUSDC();
+        setModalType('success');
+      });
     }
   };
 
@@ -219,7 +224,7 @@ export default function ShopThemesScreen({ onBack, soundEnabled, onToggleSound }
                   soundManager.play('click');
                   if (isUnlocked && !isSelected) {
                     soundManager.play('click');
-                    setSelectedTheme(theme.id);
+                    selectTheme(theme.id);
                   } else if (!isUnlocked && (canAfford || theme.cost === 0)) {
                     soundManager.play('click');
                     handlePurchaseClick(theme);

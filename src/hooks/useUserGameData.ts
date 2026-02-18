@@ -3,12 +3,8 @@
 import { useGameData } from '~/components/providers/GameDataProvider';
 
 /**
- * Hook to access user game data (tokens, skins, themes).
- * Now completely powered by GameDataProvider context to ensure global consistency.
+ * Clean bridge to the GameDataProvider.
  */
 export function useUserGameData(context?: any) {
-  // We ignore the context parameter now as the provider handles it via useNeynarUser internally.
-  const data = useGameData();
-
-  return data;
+  return useGameData();
 }

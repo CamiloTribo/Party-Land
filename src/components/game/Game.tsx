@@ -28,7 +28,7 @@ export default function Game() {
   }, [soundEnabled]);
 
   const {
-    setTokens,
+    addTokens,
     selectedSkin,
     selectedTheme,
   } = useUserGameData();
@@ -73,14 +73,14 @@ export default function Game() {
   const handleGameOver = (score: number) => {
     setFinalScore(score);
     setTokensEarned(score);
-    setTokens(prev => prev + score);
+    addTokens(score, 'Game Over Reward');
     setGameState('gameover');
   };
 
   const handleVictory = (score: number) => {
     setFinalScore(score);
     setTokensEarned(score + 500);
-    setTokens(prev => prev + score + 500);
+    addTokens(score + 500, 'Victory Reward');
     setGameState('victory');
   };
 

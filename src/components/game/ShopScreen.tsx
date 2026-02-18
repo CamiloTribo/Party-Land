@@ -60,10 +60,9 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
     usdcBalance,
     unlockedSkins,
     selectedSkin,
-    setSelectedSkin,
-    unlockSkin,
-    setTokens,
-    refetchUSDC, // Para refrescar balance después de compra
+    selectSkin,
+    buySkin,
+    refetchUSDC,
   } = useUserGameData();
 
   const [shopType, setShopType] = useState<'tokens' | 'usdc'>('tokens');
@@ -94,12 +93,17 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
     if (!selectedItem) return;
 
     if (selectedItem.currency === 'tokens') {
-      // Compra con tokens
+      // Compra con tokens usando la nueva función atómica
       if (tokens >= selectedItem.cost) {
-        unlockSkin(selectedItem.id);
-        setTokens((prev) => prev - selectedItem.cost);
-        setSelectedSkin(selectedItem.id);
-        setModalType('success');
+        buySkin(selectedItem.id, selectedItem.cost).then(success => {
+          if (success) {
+            selectSkin(selectedItem.id);
+            setModalType('success');
+          } else {
+            alert('Purchase failed. Please try again.');
+            setModalOpen(false);
+          }
+        });
       }
     } else {
       // Compra con USDC - NO RESTA BALANCE AQUÍ
@@ -115,10 +119,13 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
   const handlePurchaseSuccess = () => {
     // Called after successful USDC payment
     if (selectedItem) {
-      unlockSkin(selectedItem.id);
-      setSelectedSkin(selectedItem.id);
-      refetchUSDC(); // Refresh balance from blockchain
-      setModalType('success');
+      // Para USDC no restamos tokens, pero sí desbloqueamos (esta parte requiere que el provider maneje desbloqueos sin costo si es USDC, 
+      // o simplemente llamar a una acción de unlock. Por ahora mantengo buySkin con cost 0 para USDC)
+      buySkin(selectedItem.id, 0).then(() => {
+        selectSkin(selectedItem.id);
+        refetchUSDC();
+        setModalType('success');
+      });
     }
   };
 
@@ -219,7 +226,7 @@ export default function ShopScreen({ onBack, soundEnabled, onToggleSound }: Shop
                   soundManager.play('click');
                   if (isUnlocked && !isSelected) {
                     soundManager.play('click');
-                    setSelectedSkin(skin.id);
+                    selectSkin(skin.id);
                   } else if (!isUnlocked && (canAfford || skin.cost === 0)) {
                     soundManager.play('click');
                     handlePurchaseClick(skin);
