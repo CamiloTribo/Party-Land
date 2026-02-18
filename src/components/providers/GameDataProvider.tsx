@@ -13,12 +13,6 @@ import {
     updatePreferencesAction
 } from '~/app/actions/userActions';
 
-// Default values
-const DEFAULT_SKINS = ['classic'];
-const DEFAULT_THEMES = ['classic-pink', 'ocean-blue', 'forest-green', 'sunset-orange'];
-const DEFAULT_SKIN = 'classic';
-const DEFAULT_THEME = 'classic-pink';
-
 interface GameDataContextType {
     tokens: number;
     setTokens: (val: number | ((prev: number) => number)) => void;
@@ -43,14 +37,20 @@ interface GameDataContextType {
 
 const GameDataContext = createContext<GameDataContextType | undefined>(undefined);
 
+const DEFAULT_SKINS = ['classic'];
+const DEFAULT_THEMES = ['classic-pink', 'ocean-blue', 'forest-green', 'sunset-orange'];
+const DEFAULT_SKIN = 'classic';
+const DEFAULT_THEME = 'classic-pink';
+
 export function GameDataProvider({ children }: { children: React.ReactNode }) {
     const { context } = useMiniApp();
     const { address: walletAddress, isConnected } = useAccount();
     const { user } = useNeynarUser(context || undefined);
     const { balance: usdcBalance, loading: usdcLoading, refetch: refetchUSDC } = useUSDCBalance();
 
-    const isLocalStorageLoaded = useRef(false);
-    const isFirstSyncDone = useRef(false);
+    const isLoadedFromLocalStorage = useRef(false);
+    const isSyncingFromDB = useRef(false);
+    const lastSyncedTokens = useRef<number | null>(null);
 
     // State
     const [tokens, setTokens] = useState(0);
@@ -59,84 +59,72 @@ export function GameDataProvider({ children }: { children: React.ReactNode }) {
     const [unlockedThemes, setUnlockedThemes] = useState<string[]>(DEFAULT_THEMES);
     const [selectedTheme, setSelectedTheme] = useState(DEFAULT_THEME);
 
-    // 1. Initial Load from LocalStorage (Fastest)
+    // 1. Load LocalStorage immediately
     useEffect(() => {
-        if (typeof window !== 'undefined' && !isLocalStorageLoaded.current) {
-            console.log('📦 [GameProvider] Initializing from LocalStorage');
-            const savedTokens = localStorage.getItem('gameTokens');
-            if (savedTokens) setTokens(parseInt(savedTokens));
+        if (typeof window !== 'undefined' && !isLoadedFromLocalStorage.current) {
+            console.log('📦 [GameProvider] Loading LocalStorage...');
+            const t = localStorage.getItem('gameTokens');
+            const s = localStorage.getItem('unlockedSkins');
+            const sk = localStorage.getItem('selectedSkin');
+            const th = localStorage.getItem('unlockedThemes');
+            const tm = localStorage.getItem('selectedTheme');
 
-            const savedSkins = localStorage.getItem('unlockedSkins');
-            if (savedSkins) setUnlockedSkins(JSON.parse(savedSkins));
+            if (t) setTokens(parseInt(t));
+            if (s) setUnlockedSkins(JSON.parse(s));
+            if (sk) setSelectedSkin(sk);
+            if (th) setUnlockedThemes(JSON.parse(th));
+            if (tm) setSelectedTheme(tm);
 
-            const savedSkin = localStorage.getItem('selectedSkin');
-            if (savedSkin) setSelectedSkin(savedSkin);
-
-            const savedThemes = localStorage.getItem('unlockedThemes');
-            if (savedThemes) setUnlockedThemes(JSON.parse(savedThemes));
-
-            const savedTheme = localStorage.getItem('selectedTheme');
-            if (savedTheme) setSelectedTheme(savedTheme);
-
-            isLocalStorageLoaded.current = true;
+            isLoadedFromLocalStorage.current = true;
         }
     }, []);
 
-    // 2. Sync FROM Supabase (Source of Truth after login)
+    // 2. Sync FROM DB
     useEffect(() => {
-        async function syncFromDB() {
-            if (!user?.fid || isFirstSyncDone.current) return;
+        async function fetchUser() {
+            if (!user?.fid) return;
 
-            try {
-                console.log(`🔄 [GameProvider] Fetching Supabase data for FID: ${user.fid}`);
-                const { data: dbUser, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('fid', user.fid)
-                    .single();
+            isSyncingFromDB.current = true;
+            console.log(`🔄 [GameProvider] Fetching DB for FID: ${user.fid}`);
 
-                if (error && error.code !== 'PGRST116') {
-                    console.error('[GameProvider] Supabase Get Error:', error);
-                    return;
-                }
+            const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('fid', user.fid)
+                .single();
 
-                if (dbUser) {
-                    console.log('[GameProvider] ✅ DB State loaded:', dbUser);
-                    setTokens(dbUser.tokens);
-                    setUnlockedSkins(dbUser.unlocked_skins || DEFAULT_SKINS);
-                    setSelectedSkin(dbUser.selected_skin || DEFAULT_SKIN);
-                    setUnlockedThemes(dbUser.unlocked_themes || DEFAULT_THEMES);
-                    setSelectedTheme(dbUser.selected_theme || DEFAULT_THEME);
-                } else {
-                    console.log('[GameProvider] 🆕 New user detected in Supabase, creating record...');
-                    // Optional: Initial token reward for new users
-                    const initialTokens = 500;
-                    setTokens(initialTokens);
-
-                    await supabase.from('users').upsert({
-                        fid: user.fid,
-                        username: user.username,
-                        display_name: user.display_name,
-                        pfp_url: user.pfp_url,
-                        tokens: initialTokens,
-                        unlocked_skins: DEFAULT_SKINS,
-                        unlocked_themes: DEFAULT_THEMES,
-                        selected_skin: DEFAULT_SKIN,
-                        selected_theme: DEFAULT_THEME,
-                    });
-                }
-                isFirstSyncDone.current = true;
-            } catch (err) {
-                console.error('[GameProvider] Sync process failed:', err);
+            if (!error && data) {
+                console.log('✅ [GameProvider] DB Data Loaded:', data);
+                setTokens(data.tokens);
+                lastSyncedTokens.current = data.tokens;
+                setUnlockedSkins(data.unlocked_skins || DEFAULT_SKINS);
+                setSelectedSkin(data.selected_skin || DEFAULT_SKIN);
+                setUnlockedThemes(data.unlocked_themes || DEFAULT_THEMES);
+                setSelectedTheme(data.selected_theme || DEFAULT_THEME);
+            } else if (error && error.code === 'PGRST116') {
+                console.log('🆕 [GameProvider] Creating DB record for new user');
+                await supabase.from('users').upsert({
+                    fid: user.fid,
+                    username: user.username,
+                    display_name: user.display_name,
+                    pfp_url: user.pfp_url,
+                    tokens: tokens,
+                    unlocked_skins: unlockedSkins,
+                    unlocked_themes: unlockedThemes,
+                    selected_skin: selectedSkin,
+                    selected_theme: selectedTheme,
+                });
+                lastSyncedTokens.current = tokens;
             }
+            isSyncingFromDB.current = false;
         }
 
-        if (user?.fid) syncFromDB();
+        if (user?.fid) fetchUser();
     }, [user?.fid]);
 
-    // 3. Keep LocalStorage in sync (Secondary storage)
+    // 3. Save to LocalStorage
     useEffect(() => {
-        if (!isLocalStorageLoaded.current) return;
+        if (!isLoadedFromLocalStorage.current) return;
         localStorage.setItem('gameTokens', tokens.toString());
         localStorage.setItem('unlockedSkins', JSON.stringify(unlockedSkins));
         localStorage.setItem('selectedSkin', selectedSkin);
@@ -144,62 +132,62 @@ export function GameDataProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('selectedTheme', selectedTheme);
     }, [tokens, unlockedSkins, selectedSkin, unlockedThemes, selectedTheme]);
 
-    // --- Actions ---
+    // 4. SYNC TO DB (The important part)
+    useEffect(() => {
+        if (!user?.fid || isSyncingFromDB.current) return;
 
-    const setTokensWithSync = useCallback((val: number | ((prev: number) => number)) => {
-        setTokens(prev => {
-            const nextVal = typeof val === 'function' ? val(prev) : val;
-            if (nextVal !== prev) {
-                if (user?.fid) {
-                    console.log(`🌐 [GameProvider] Syncing: ${prev} -> ${nextVal}`);
-                    // We fire and forget the server update to keep UI snappy
-                    updateUserTokensAction(user.fid, nextVal, nextVal > prev ? 'Earning' : 'Spending')
-                        .catch(err => console.error('❌ Failed to update server tokens:', err));
+        // Avoid double syncing if value hasn't changed from DB
+        if (lastSyncedTokens.current === tokens) return;
+
+        const syncTokens = async () => {
+            console.log(`🌐 [GameProvider] SYNCING TO DB: ${tokens} (FID: ${user.fid})`);
+            try {
+                const result = await updateUserTokensAction(user.fid, tokens, 'Auto-sync');
+                console.log('📡 [GameProvider] Sync Result:', result);
+                if (result.success) {
+                    lastSyncedTokens.current = tokens;
                 }
+            } catch (err) {
+                console.error('❌ [GameProvider] Sync Failed:', err);
             }
-            return nextVal;
-        });
-    }, [user?.fid]);
+        };
 
+        // Debounce/Delay slightly if needed, but for now direct call
+        syncTokens();
+    }, [tokens, user?.fid]);
+
+    // Actions
     const setSelectedSkinWithSync = useCallback((skinId: string) => {
         setSelectedSkin(skinId);
-        if (user?.fid) {
-            updatePreferencesAction(user.fid, { selected_skin: skinId }).catch(console.error);
-        }
+        if (user?.fid) updatePreferencesAction(user.fid, { selected_skin: skinId }).catch(console.error);
     }, [user?.fid]);
 
     const unlockSkinWithSync = useCallback((skinId: string) => {
         setUnlockedSkins(prev => {
             if (prev.includes(skinId)) return prev;
             const next = [...prev, skinId];
-            if (user?.fid) {
-                addUnlockedSkinAction(user.fid, skinId).catch(console.error);
-            }
+            if (user?.fid) addUnlockedSkinAction(user.fid, skinId).catch(console.error);
             return next;
         });
     }, [user?.fid]);
 
     const setSelectedThemeWithSync = useCallback((themeId: string) => {
         setSelectedTheme(themeId);
-        if (user?.fid) {
-            updatePreferencesAction(user.fid, { selected_theme: themeId }).catch(console.error);
-        }
+        if (user?.fid) updatePreferencesAction(user.fid, { selected_theme: themeId }).catch(console.error);
     }, [user?.fid]);
 
     const unlockThemeWithSync = useCallback((themeId: string) => {
         setUnlockedThemes(prev => {
             if (prev.includes(themeId)) return prev;
             const next = [...prev, themeId];
-            if (user?.fid) {
-                addUnlockedThemeAction(user.fid, themeId).catch(console.error);
-            }
+            if (user?.fid) addUnlockedThemeAction(user.fid, themeId).catch(console.error);
             return next;
         });
     }, [user?.fid]);
 
     const value = {
         tokens,
-        setTokens: setTokensWithSync,
+        setTokens, // Use direct setter, the useEffect handles the sync
         unlockedSkins,
         selectedSkin,
         setSelectedSkin: setSelectedSkinWithSync,
