@@ -67,6 +67,8 @@ export async function getFarcasterDomainManifest(): Promise<Manifest> {
       ogTitle: APP_NAME,
       ogDescription: APP_DESCRIPTION.substring(0, 100),
       ogImageUrl: APP_OG_IMAGE_URL,
+      screenshotUrls: [],
+      heroImageUrl: APP_OG_IMAGE_URL, // Usamos la OG image como hero temporalmente
     } as any,
   };
 }
