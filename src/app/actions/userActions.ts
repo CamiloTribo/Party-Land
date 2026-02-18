@@ -5,151 +5,126 @@ import { revalidatePath } from 'next/cache';
 
 /**
  * Server Action to update user tokens.
- * This ensures the update is logged and handled on the server side.
  */
 export async function updateUserTokensAction(fid: number, tokens: number, reason: string = 'generic update') {
-    console.log(`[Server Action] 🪙 Updating tokens for FID: ${fid}. New value: ${tokens}. Reason: ${reason}`);
+    console.log(`[SERVER] 🪙 FID: ${fid} | TOKENS: ${tokens} | REASON: ${reason}`);
 
-    const supabase = getSupabaseService();
+    try {
+        const supabase = getSupabaseService();
+        const { data, error } = await supabase
+            .from('users')
+            .update({
+                tokens,
+                updated_at: new Date().toISOString()
+            })
+            .eq('fid', fid)
+            .select();
 
-    const { data, error } = await supabase
-        .from('users')
-        .update({
-            tokens,
-            updated_at: new Date().toISOString()
-        })
-        .eq('fid', fid)
-        .select()
-        .single();
+        if (error) {
+            console.error(`[SERVER] ❌ Error updating tokens for FID ${fid}:`, error.message);
+            return { success: false, error: error.message };
+        }
 
-    if (error) {
-        console.error(`[Server Action] ❌ Error updating tokens for FID: ${fid}:`, error);
-        throw new Error('Failed to update tokens');
+        console.log(`[SERVER] ✅ Success for FID ${fid}. New balance: ${tokens}`);
+        revalidatePath('/');
+        return { success: true, data };
+    } catch (e: any) {
+        console.error(`[SERVER] 💥 Crash updating tokens for FID ${fid}:`, e.message);
+        return { success: false, error: e.message };
     }
-
-    console.log(`[Server Action] ✅ Tokens updated successfully for FID: ${fid}. Row:`, data);
-    revalidatePath('/');
-    return data;
 }
 
 /**
  * Server Action to add an unlocked skin.
  */
 export async function addUnlockedSkinAction(fid: number, skinId: string) {
-    console.log(`[Server Action] 🎭 Unlocking skin "${skinId}" for FID: ${fid}`);
+    console.log(`[SERVER] 🎭 FID: ${fid} | UNLOCKING SKIN: ${skinId}`);
 
-    const supabase = getSupabaseService();
-
-    // First get current skins
-    const { data: user, error: fetchError } = await supabase
-        .from('users')
-        .select('unlocked_skins')
-        .eq('fid', fid)
-        .single();
-
-    if (fetchError) {
-        console.error(`[Server Action] ❌ Error fetching skins for FID: ${fid}:`, fetchError);
-        throw new Error('Failed to fetch skins');
-    }
-
-    const currentSkins = Array.isArray(user.unlocked_skins) ? user.unlocked_skins : ['classic'];
-    if (!currentSkins.includes(skinId)) {
-        const newSkins = [...currentSkins, skinId];
-
-        const { data: updatedUser, error: updateError } = await supabase
+    try {
+        const supabase = getSupabaseService();
+        const { data: user, error: fetchError } = await supabase
             .from('users')
-            .update({
-                unlocked_skins: newSkins,
-                updated_at: new Date().toISOString()
-            })
+            .select('unlocked_skins')
             .eq('fid', fid)
-            .select()
             .single();
 
-        if (updateError) {
-            console.error(`[Server Action] ❌ Error updating skins for FID: ${fid}:`, updateError);
-            throw new Error('Failed to update skins');
+        if (fetchError) {
+            console.error(`[SERVER] ❌ Error fetching skins for FID ${fid}:`, fetchError.message);
+            return { success: false, error: fetchError.message };
         }
 
-        console.log(`[Server Action] ✅ Skin "${skinId}" unlocked for FID: ${fid}`);
-        revalidatePath('/');
-        return updatedUser;
-    }
+        const currentSkins = Array.isArray(user.unlocked_skins) ? user.unlocked_skins : ['classic'];
+        if (!currentSkins.includes(skinId)) {
+            const newSkins = [...currentSkins, skinId];
+            const { error: updateError } = await supabase
+                .from('users')
+                .update({ unlocked_skins: newSkins, updated_at: new Date().toISOString() })
+                .eq('fid', fid);
 
-    return user;
+            if (updateError) {
+                console.error(`[SERVER] ❌ Error updating skins for FID ${fid}:`, updateError.message);
+                return { success: false, error: updateError.message };
+            }
+            console.log(`[SERVER] ✅ Skin ${skinId} unlocked for FID ${fid}`);
+        }
+        revalidatePath('/');
+        return { success: true };
+    } catch (e: any) {
+        console.error(`[SERVER] 💥 Crash updating skins for FID ${fid}:`, e.message);
+        return { success: false, error: e.message };
+    }
 }
 
 /**
  * Server Action to add an unlocked theme.
  */
 export async function addUnlockedThemeAction(fid: number, themeId: string) {
-    console.log(`[Server Action] 🎨 Unlocking theme "${themeId}" for FID: ${fid}`);
+    console.log(`[SERVER] 🎨 FID: ${fid} | UNLOCKING THEME: ${themeId}`);
 
-    const supabase = getSupabaseService();
-
-    // First get current themes
-    const { data: user, error: fetchError } = await supabase
-        .from('users')
-        .select('unlocked_themes')
-        .eq('fid', fid)
-        .single();
-
-    if (fetchError) {
-        console.error(`[Server Action] ❌ Error fetching themes for FID: ${fid}:`, fetchError);
-        throw new Error('Failed to fetch themes');
-    }
-
-    const currentThemes = Array.isArray(user.unlocked_themes) ? user.unlocked_themes : [];
-    if (!currentThemes.includes(themeId)) {
-        const newThemes = [...currentThemes, themeId];
-
-        const { data: updatedUser, error: updateError } = await supabase
+    try {
+        const supabase = getSupabaseService();
+        const { data: user, error: fetchError } = await supabase
             .from('users')
-            .update({
-                unlocked_themes: newThemes,
-                updated_at: new Date().toISOString()
-            })
+            .select('unlocked_themes')
             .eq('fid', fid)
-            .select()
             .single();
 
-        if (updateError) {
-            console.error(`[Server Action] ❌ Error updating themes for FID: ${fid}:`, updateError);
-            throw new Error('Failed to update themes');
+        if (fetchError) return { success: false, error: fetchError.message };
+
+        const currentThemes = Array.isArray(user.unlocked_themes) ? user.unlocked_themes : [];
+        if (!currentThemes.includes(themeId)) {
+            const newThemes = [...currentThemes, themeId];
+            await supabase
+                .from('users')
+                .update({ unlocked_themes: newThemes, updated_at: new Date().toISOString() })
+                .eq('fid', fid);
+            console.log(`[SERVER] ✅ Theme ${themeId} unlocked for FID ${fid}`);
         }
-
-        console.log(`[Server Action] ✅ Theme "${themeId}" unlocked for FID: ${fid}`);
         revalidatePath('/');
-        return updatedUser;
+        return { success: true };
+    } catch (e: any) {
+        return { success: false, error: e.message };
     }
-
-    return user;
 }
 
 /**
  * Server Action to update preferred skin/theme.
  */
 export async function updatePreferencesAction(fid: number, preferences: { selected_skin?: string, selected_theme?: string }) {
-    console.log(`[Server Action] ⚙️ Updating preferences for FID: ${fid}:`, preferences);
+    console.log(`[SERVER] ⚙️ FID: ${fid} | PREFS:`, preferences);
 
-    const supabase = getSupabaseService();
+    try {
+        const supabase = getSupabaseService();
+        const { error } = await supabase
+            .from('users')
+            .update({ ...preferences, updated_at: new Date().toISOString() })
+            .eq('fid', fid);
 
-    const { data, error } = await supabase
-        .from('users')
-        .update({
-            ...preferences,
-            updated_at: new Date().toISOString()
-        })
-        .eq('fid', fid)
-        .select()
-        .single();
-
-    if (error) {
-        console.error(`[Server Action] ❌ Error updating preferences for FID: ${fid}:`, error);
-        throw new Error('Failed to update preferences');
+        if (error) return { success: false, error: error.message };
+        console.log(`[SERVER] ✅ Preferences updated for FID ${fid}`);
+        revalidatePath('/');
+        return { success: true };
+    } catch (e: any) {
+        return { success: false, error: e.message };
     }
-
-    console.log(`[Server Action] ✅ Preferences updated for FID: ${fid}`);
-    revalidatePath('/');
-    return data;
 }

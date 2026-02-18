@@ -6,6 +6,7 @@ import { SessionProvider } from 'next-auth/react';
 import { AuthKitProvider } from '@farcaster/auth-kit';
 import { MiniAppProvider } from '@neynar/react';
 import { SafeFarcasterSolanaProvider } from '~/components/providers/SafeFarcasterSolanaProvider';
+import { GameDataProvider } from '~/components/providers/GameDataProvider';
 import { ANALYTICS_ENABLED, RETURN_URL } from '~/lib/constants';
 
 const WagmiProvider = dynamic(
@@ -33,9 +34,11 @@ export function Providers({
           returnUrl={RETURN_URL}
         >
           <SafeFarcasterSolanaProvider endpoint={solanaEndpoint}>
-            <AuthKitProvider config={{}}>
-              {children}
-            </AuthKitProvider>
+            <GameDataProvider>
+              <AuthKitProvider config={{}}>
+                {children}
+              </AuthKitProvider>
+            </GameDataProvider>
           </SafeFarcasterSolanaProvider>
         </MiniAppProvider>
       </WagmiProvider>
