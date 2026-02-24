@@ -7,8 +7,9 @@ import { Volume2, VolumeX, ShoppingBag, Coins, DollarSign } from 'lucide-react';
 import PinkPantherPlayer from '../PinkPantherPlayer';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import { GameAuthButton } from './GameAuthButton';
+import { WelcomeRewardModal } from './WelcomeRewardModal';
 import { useMiniApp } from '@neynar/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface StartScreenProps {
   onStart: () => void;
@@ -20,7 +21,29 @@ interface StartScreenProps {
 
 export default function StartScreen({ onStart, onSelectGames, onOpenShop, soundEnabled, onToggleSound }: StartScreenProps) {
   const { context } = useMiniApp();
-  const { tokens, selectedSkin, username, displayName, pfpUrl, fid, usdcBalance, usdcLoading, walletAddress } = useUserGameData(context || undefined);
+  const {
+    tokens,
+    selectedSkin,
+    username,
+    displayName,
+    pfpUrl,
+    fid,
+    usdcBalance,
+    usdcLoading,
+    walletAddress,
+    welcomeRewardClaimed,
+    claimReward
+  } = useUserGameData(context || undefined);
+
+  const [showRewardModal, setShowRewardModal] = useState(false);
+
+  // Check if we should show the welcome reward modal
+  useEffect(() => {
+    if (fid && !welcomeRewardClaimed) {
+      const timer = setTimeout(() => setShowRewardModal(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [fid, welcomeRewardClaimed]);
 
   // Debug logging
   useEffect(() => {
@@ -133,6 +156,16 @@ export default function StartScreen({ onStart, onSelectGames, onOpenShop, soundE
       <div className="absolute bottom-4 text-center text-white/90 text-[10px] px-6 font-bold uppercase tracking-widest drop-shadow-md">
         <p>Multiple games • One progression • Pure Fun</p>
       </div>
+
+      {/* Welcome Reward Modal */}
+      <WelcomeRewardModal
+        isOpen={showRewardModal}
+        onClaim={async () => {
+          await claimReward();
+          setShowRewardModal(false);
+          soundManager.play('click');
+        }}
+      />
     </div>
   )
 }

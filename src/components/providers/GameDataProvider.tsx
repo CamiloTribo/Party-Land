@@ -10,7 +10,9 @@ import {
     updateUserTokensAction,
     purchaseSkinAction,
     purchaseThemeAction,
-    updatePreferencesAction
+    updatePreferencesAction,
+    syncUserProfileAction,
+    claimWelcomeRewardAction
 } from '~/app/actions/userActions';
 
 interface GameDataContextType {
@@ -29,6 +31,7 @@ interface GameDataContextType {
     displayName?: string;
     pfpUrl?: string;
     isSyncing: boolean;
+    welcomeRewardClaimed: boolean;
 
     // Explicit Mutation Functions
     addTokens: (amount: number, reason: string) => Promise<void>;
@@ -36,6 +39,7 @@ interface GameDataContextType {
     buyTheme: (themeId: string, cost: number) => Promise<boolean>;
     selectSkin: (skinId: string) => Promise<void>;
     selectTheme: (themeId: string) => Promise<void>;
+    claimReward: () => Promise<void>;
     forceRefresh: () => Promise<void>;
 }
 
@@ -56,6 +60,7 @@ export function GameDataProvider({ children }: { children: React.ReactNode }) {
     const [unlockedThemes, setUnlockedThemes] = useState<string[]>(DEFAULT_THEMES);
     const [selectedTheme, setSelectedTheme] = useState('classic-pink');
     const [isSyncing, setIsSyncing] = useState(true);
+    const [welcomeRewardClaimed, setWelcomeRewardClaimed] = useState(true); // Default to true to hide initially
 
     // 1. Fetch source of truth from Database on mount/login
     const fetchState = useCallback(async (fid: number) => {
@@ -74,6 +79,7 @@ export function GameDataProvider({ children }: { children: React.ReactNode }) {
                 setSelectedSkin(data.selected_skin || 'classic');
                 setUnlockedThemes(data.unlocked_themes || DEFAULT_THEMES);
                 setSelectedTheme(data.selected_theme || 'classic-pink');
+                setWelcomeRewardClaimed(data.welcome_reward_claimed || false);
 
                 // Parallel save to localstorage for instant load next time
                 localStorage.setItem('gameTokens', data.tokens.toString());
@@ -86,8 +92,19 @@ export function GameDataProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        if (user?.fid) fetchState(user.fid);
-    }, [user?.fid, fetchState]);
+        if (user?.fid) {
+            // Aseguramos que el perfil esté sincronizado con Supabase
+            syncUserProfileAction({
+                fid: user.fid,
+                username: user.username,
+                display_name: user.display_name,
+                pfp_url: user.pfp_url,
+                wallet_address: user.wallet_address
+            }).then(() => {
+                fetchState(user.fid!);
+            });
+        }
+    }, [user?.fid, user?.username, user?.display_name, user?.pfp_url, fetchState]);
 
     // 2. Initial LocalStorage load (for UI snapiness only)
     useEffect(() => {
@@ -156,6 +173,17 @@ export function GameDataProvider({ children }: { children: React.ReactNode }) {
         if (user?.fid) updatePreferencesAction(user.fid, { selected_theme: themeId }).catch(console.error);
     };
 
+    const claimReward = async () => {
+        if (!user?.fid || welcomeRewardClaimed) return;
+
+        const res = await claimWelcomeRewardAction(user.fid);
+        if (res.success && 'amount' in res) {
+            setTokens(prev => prev + (res.amount as number));
+            setWelcomeRewardClaimed(true);
+            localStorage.setItem('gameTokens', (tokens + (res.amount as number)).toString());
+        }
+    };
+
     const value = {
         tokens,
         unlockedSkins,
@@ -172,11 +200,13 @@ export function GameDataProvider({ children }: { children: React.ReactNode }) {
         displayName: user?.display_name,
         pfpUrl: user?.pfp_url,
         isSyncing,
+        welcomeRewardClaimed,
         addTokens,
         buySkin,
         buyTheme,
         selectSkin,
         selectTheme,
+        claimReward,
         forceRefresh: () => user?.fid ? fetchState(user.fid) : Promise.resolve(),
     };
 

@@ -6,6 +6,7 @@ export interface NeynarUser {
   username?: string;
   display_name?: string;
   pfp_url?: string;
+  wallet_address?: string;
 }
 
 export function useNeynarUser(context?: { user?: { fid?: number } }) {
@@ -28,7 +29,11 @@ export function useNeynarUser(context?: { user?: { fid?: number } }) {
       })
       .then((data) => {
         if (data.users?.[0]) {
-          setUser(data.users[0]);
+          const nUser = data.users[0];
+          setUser({
+            ...nUser,
+            wallet_address: nUser.verified_addresses?.eth_addresses?.[0] || null
+          });
         } else {
           setUser(null);
         }

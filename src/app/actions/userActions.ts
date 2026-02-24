@@ -142,3 +142,96 @@ export async function updatePreferencesAction(fid: number, preferences: { select
         return handleDBError(fid, 'Exception in prefs', e);
     }
 }
+/**
+ * Sync or create user profile in Supabase.
+ * Ensures username, display_name, and pfp_url are always present.
+ */
+export async function syncUserProfileAction(profile: {
+    fid: number,
+    username?: string,
+    display_name?: string,
+    pfp_url?: string,
+    wallet_address?: string
+}) {
+    console.log(`[SERVER_SYNC] 👤 Syncing profile for FID ${profile.fid}`);
+
+    try {
+        const supabase = getSupabaseService();
+
+        // Defaults for new users
+        const defaultSkins = ['classic'];
+        const defaultThemes = ['classic-pink', 'ocean-blue', 'forest-green', 'sunset-orange'];
+
+        const { data, error } = await supabase
+            .from('users')
+            .upsert({
+                fid: profile.fid,
+                username: profile.username || null,
+                display_name: profile.display_name || null,
+                pfp_url: profile.pfp_url || null,
+                wallet_address: profile.wallet_address || null,
+                updated_at: new Date().toISOString(),
+                // Only provide defaults if they don't exist (handled by DB defaults or explicit check)
+                // However, upsert will overwrite if we provide them. 
+                // Better to use an insert-if-not-exists logic or only update profile fields.
+            }, {
+                onConflict: 'fid',
+                ignoreDuplicates: false // We want to update the profile info
+            })
+            .select()
+            .single();
+
+        if (error) return handleDBError(profile.fid, 'Sync profile', error);
+
+        console.log(`[SERVER_SYNC] ✅ Profile synced for ${profile.username || profile.fid}`);
+        revalidatePath('/');
+        return { success: true, data };
+    } catch (e: any) {
+        return handleDBError(profile.fid, 'Exception in profile sync', e);
+    }
+}
+
+/**
+ * Claim the one-time welcome reward (230 tokens).
+ */
+export async function claimWelcomeRewardAction(fid: number) {
+    console.log(`[SERVER_REWARD] 🎁 FID ${fid} claiming welcome reward...`);
+
+    try {
+        const supabase = getSupabaseService();
+
+        // 1. Check if already claimed
+        const { data: user, error: fetchError } = await supabase
+            .from('users')
+            .select('tokens, welcome_reward_claimed, unlocked_skins, unlocked_themes')
+            .eq('fid', fid)
+            .single();
+
+        if (fetchError) return handleDBError(fid, 'Fetch reward status', fetchError);
+        if (user.welcome_reward_claimed) return { success: false, error: 'Already claimed' };
+
+        const rewardAmount = 230;
+        const currentSkins = Array.isArray(user.unlocked_skins) ? user.unlocked_skins : ['classic'];
+        const currentThemes = Array.isArray(user.unlocked_themes) ? user.unlocked_themes : ['classic-pink', 'ocean-blue', 'forest-green', 'sunset-orange'];
+
+        // 2. Update user
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({
+                tokens: (user.tokens || 0) + rewardAmount,
+                welcome_reward_claimed: true,
+                unlocked_skins: currentSkins.includes('classic') ? currentSkins : [...currentSkins, 'classic'],
+                unlocked_themes: currentThemes.length > 0 ? currentThemes : ['classic-pink', 'ocean-blue', 'forest-green', 'sunset-orange'],
+                updated_at: new Date().toISOString()
+            })
+            .eq('fid', fid);
+
+        if (updateError) return handleDBError(fid, 'Update reward status', updateError);
+
+        console.log(`[SERVER_REWARD] ✅ Success! FID ${fid} received ${rewardAmount} tokens.`);
+        revalidatePath('/');
+        return { success: true, amount: rewardAmount };
+    } catch (e: any) {
+        return handleDBError(fid, 'Exception in welcome reward', e);
+    }
+}
