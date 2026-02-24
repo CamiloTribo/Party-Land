@@ -27,6 +27,15 @@ export default function Game() {
     soundManager.toggle(soundEnabled);
   }, [soundEnabled]);
 
+  // Handle Background Music transitions
+  useEffect(() => {
+    if (gameState === 'playing') {
+      soundManager.playMusic('game-theme-panther');
+    } else {
+      soundManager.playMusic('main-theme');
+    }
+  }, [gameState]);
+
   const {
     addTokens,
     selectedSkin,
