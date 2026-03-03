@@ -1,7 +1,7 @@
 // app/api/claim-usdc-milestone/route.ts
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { createWalletClient, http, parseUnits, createPublicClient, isAddress } from "viem";
+import { createWalletClient, http, parseUnits, createPublicClient, isAddress, encodeFunctionData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { base } from "viem/chains";
 import type { Abi } from "viem";
@@ -151,8 +151,8 @@ export async function POST(req: NextRequest) {
             transport: http(RPC_URL),
         });
 
-        // --- 6. Simulate first, then send ---
-        const { request } = await publicClient.simulateContract({
+        // --- 6. Simulate first to validate, then send with Builder Code attribution ---
+        await publicClient.simulateContract({
             address: USDC_CONTRACT_ADDRESS,
             abi: USDC_ABI,
             functionName: "transfer",
@@ -161,15 +161,28 @@ export async function POST(req: NextRequest) {
         });
         console.log(`[USDC_CLAIM] ✅ Simulation passed.`);
 
-        const transactionHash = await walletClient.writeContract({
-            address: request.address,
-            abi: request.abi,
-            functionName: request.functionName,
-            args: request.args,
+        // Attach ERC-8021 Builder Code suffix for Base attribution
+        const BUILDER_CODE = process.env.NEXT_PUBLIC_BUILDER_CODE || 'bc_gxwyq1ir';
+        const codeHex = Array.from(BUILDER_CODE).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+        const len = BUILDER_CODE.length.toString(16).padStart(2, '0');
+        const builderSuffix = `${codeHex}${len}00${'8021'.repeat(8)}`;
+
+        const calldata = encodeFunctionData({
+            abi: USDC_ABI,
+            functionName: 'transfer',
+            args: [user.wallet_address as `0x${string}`, amountInUnits],
+        });
+        const dataWithBuilderCode = `${calldata}${builderSuffix}` as `0x${string}`;
+        console.log(`[USDC_CLAIM] 🏗️ Builder Code attached: ${BUILDER_CODE}`);
+
+        const transactionHash = await walletClient.sendTransaction({
+            to: USDC_CONTRACT_ADDRESS,
+            data: dataWithBuilderCode,
             account: centralAccount,
             nonce: currentNonce,
             gas: BigInt(100000),
             maxFeePerGas: BigInt(1500000000), // 1.5 gwei - Base fees are very low
+            value: BigInt(0),
         });
         console.log(`[USDC_CLAIM] ✅ TX SENT! Hash: ${transactionHash}`);
 
