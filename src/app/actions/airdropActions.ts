@@ -373,3 +373,53 @@ export async function getRecentParticipantsAction(airdropId: string): Promise<
         return [];
     }
 }
+
+/**
+ * Record an on-chain airdrop claim in the transactions table.
+ * Called from the frontend after the smart contract claim() tx is confirmed.
+ */
+export async function recordAirdropClaimAction({
+    fid,
+    username,
+    walletAddress,
+    airdropId,
+    airdropLabel,
+    amountUsdc,
+    txHash,
+}: {
+    fid: number;
+    username: string;
+    walletAddress: string;
+    airdropId: string;
+    airdropLabel: string;
+    amountUsdc: number;
+    txHash: string;
+}): Promise<{ success: boolean; error?: string }> {
+    if (!fid || !walletAddress || !txHash) return { success: false, error: 'Missing required fields' };
+    try {
+        const supabase = getSupabaseService();
+
+        const { error } = await supabase.from('transactions').insert({
+            fid,
+            username,
+            wallet_address: walletAddress,
+            type: 'AIRDROP_CLAIM',
+            amount: amountUsdc,
+            currency: 'USDC',
+            item_id: airdropId,
+            description: `Claimed ${airdropLabel} reward — smart contract`,
+            tx_hash: txHash,
+        });
+
+        if (error) {
+            console.error('[AIRDROP] ❌ recordAirdropClaimAction error:', error.message);
+            return { success: false, error: error.message };
+        }
+
+        console.log(`[AIRDROP] ✅ Claim recorded: fid=${fid} amount=${amountUsdc} USDC tx=${txHash}`);
+        return { success: true };
+    } catch (e: any) {
+        console.error('[AIRDROP] ❌ recordAirdropClaimAction unexpected error:', e.message);
+        return { success: false, error: 'Internal error' };
+    }
+}

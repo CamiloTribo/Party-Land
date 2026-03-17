@@ -12,6 +12,7 @@ import {
     getActiveAirdropAction, checkUserParticipationAction,
     joinAirdropAction, getRecentParticipantsAction,
     getDistributedAirdropWithContractAction, checkUserWasParticipantAction,
+    recordAirdropClaimAction,
     type ActiveAirdrop
 } from '~/app/actions/airdropActions';
 import { PurchaseModal } from './PurchaseModal';
@@ -170,12 +171,24 @@ export function AirdropModal({ isOpen, onClose }: AirdropModalProps) {
     const { isSuccess: isClaimConfirmed } = useWaitForTransactionReceipt({ hash: claimTxHash });
 
     useEffect(() => {
-        if (isClaimConfirmed && state === 'claim_pending') {
+        if (isClaimConfirmed && claimTxHash && distributedAirdrop && state === 'claim_pending') {
             soundManager.play('coin');
             setState('claim_success');
             refetchUSDC?.();
+            // Record the claim in Supabase transactions table
+            if (fid && walletAddress) {
+                recordAirdropClaimAction({
+                    fid,
+                    username: username || '',
+                    walletAddress,
+                    airdropId: distributedAirdrop.id,
+                    airdropLabel: distributedAirdrop.label,
+                    amountUsdc: distributedAirdrop.payout_per_person,
+                    txHash: claimTxHash,
+                }).catch(e => console.error('[AIRDROP] Failed to record claim:', e));
+            }
         }
-    }, [isClaimConfirmed, state, refetchUSDC]);
+    }, [isClaimConfirmed, claimTxHash, distributedAirdrop, state, refetchUSDC, fid, walletAddress, username]);
 
     const load = useCallback(async () => {
         if (!fid) return;
