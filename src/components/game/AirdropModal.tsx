@@ -5,23 +5,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     X, PartyPopper, Trophy, Clock, Coins, Users, TrendingUp, TrendingDown,
     ChevronRight, Zap, CheckCircle2, Lock, Info, ChevronDown, ChevronUp,
-    Ticket, Smartphone, DollarSign, Calendar
+    Ticket, Smartphone, DollarSign, Calendar, Sparkles, Gift
 } from 'lucide-react';
 import { useUserGameData } from '~/hooks/useUserGameData';
 import {
     getActiveAirdropAction, checkUserParticipationAction,
     joinAirdropAction, getRecentParticipantsAction,
+    getDistributedAirdropWithContractAction, checkUserWasParticipantAction,
     type ActiveAirdrop
 } from '~/app/actions/airdropActions';
 import { PurchaseModal } from './PurchaseModal';
 import { soundManager } from '~/lib/SoundManager';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import AIRDROP_ABI from '~/abi/PartyLandAirdrop.json';
+import { attachBuilderCode } from '~/lib/utils';
+
 
 interface AirdropModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-type AirdropState = 'loading' | 'no_active' | 'not_eligible' | 'eligible' | 'already_joined' | 'success';
+type AirdropState = 'loading' | 'no_active' | 'not_eligible' | 'eligible' | 'already_joined' | 'success' | 'claim_pending' | 'claim_success';
 
 interface TimeLeft { days: number; hours: number; minutes: number; seconds: number; }
 interface RecentParticipant { username: string; joined_at: string; }
@@ -148,17 +153,60 @@ export function AirdropModal({ isOpen, onClose }: AirdropModalProps) {
     const { tokens, username, walletAddress, usdcBalance, fid, refetchUSDC } = useUserGameData();
     const [state, setState] = useState<AirdropState>('loading');
     const [airdrop, setAirdrop] = useState<ActiveAirdrop | null>(null);
+    const [distributedAirdrop, setDistributedAirdrop] = useState<ActiveAirdrop | null>(null);
     const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const [purchaseOpen, setPurchaseOpen] = useState(false);
     const [livePool, setLivePool] = useState<number>(0);
     const [liveCount, setLiveCount] = useState<number>(0);
     const [recentParticipants, setRecentParticipants] = useState<RecentParticipant[]>([]);
     const [successData, setSuccessData] = useState<{ pool: number; count: number; payout: number } | null>(null);
+    const [claimTxHash, setClaimTxHash] = useState<`0x${string}` | undefined>();
     const initialized = useRef(false);
+
+    // Wagmi hook for calling claim() on the smart contract
+    const { writeContract, isPending: isClaimPending } = useWriteContract();
+
+    // Wait for claim tx to confirm on-chain
+    const { isSuccess: isClaimConfirmed } = useWaitForTransactionReceipt({ hash: claimTxHash });
+
+    useEffect(() => {
+        if (isClaimConfirmed && state === 'claim_pending') {
+            soundManager.play('coin');
+            setState('claim_success');
+            refetchUSDC?.();
+        }
+    }, [isClaimConfirmed, state, refetchUSDC]);
 
     const load = useCallback(async () => {
         if (!fid) return;
         setState('loading');
+
+        // Check for a distributed airdrop with a claimable contract (e.g. Week 1)
+        const distributed = await getDistributedAirdropWithContractAction();
+        if (distributed?.contract_address) {
+            const { wasParticipant, walletAddress: participantWallet } = await checkUserWasParticipantAction(fid, distributed.id);
+            if (wasParticipant && participantWallet) {
+                // Read canClaim from the contract via public RPC (no wallet needed)
+                try {
+                    const { createPublicClient, http } = await import('viem');
+                    const { base } = await import('viem/chains');
+                    const publicClient = createPublicClient({ chain: base, transport: http('https://mainnet.base.org') });
+                    const eligible = await publicClient.readContract({
+                        address: distributed.contract_address as `0x${string}`,
+                        abi: AIRDROP_ABI,
+                        functionName: 'canClaim',
+                        args: [participantWallet as `0x${string}`],
+                    }) as boolean;
+                    if (eligible) {
+                        setDistributedAirdrop(distributed);
+                        setState('claim_pending');
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('[AIRDROP] contract read failed:', e);
+                }
+            }
+        }
 
         const active = await getActiveAirdropAction();
         if (!active) { setState('no_active'); return; }
@@ -177,6 +225,24 @@ export function AirdropModal({ isOpen, onClose }: AirdropModalProps) {
         else if ((tokens || 0) < 1500) setState('not_eligible');
         else setState('eligible');
     }, [fid, tokens]);
+
+    const handleContractClaim = async () => {
+        if (!distributedAirdrop?.contract_address || !walletAddress) return;
+        soundManager.play('bubble');
+        try {
+            const suffix = attachBuilderCode('0x') as `0x${string}`;
+            writeContract({
+                address: distributedAirdrop.contract_address as `0x${string}`,
+                abi: AIRDROP_ABI,
+                functionName: 'claim',
+                dataSuffix: suffix,
+            }, {
+                onSuccess: (hash) => setClaimTxHash(hash),
+            });
+        } catch (e) {
+            console.error('[AIRDROP] claim error:', e);
+        }
+    };
 
     useEffect(() => {
         if (isOpen && !initialized.current) { initialized.current = true; load(); }
@@ -264,6 +330,68 @@ export function AirdropModal({ isOpen, onClose }: AirdropModalProps) {
                                 <div className="w-10 h-10 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
                                 <p className="text-purple-300 text-sm">Loading airdrop data...</p>
                             </div>
+                        )}
+
+                        {/* CLAIM PENDING — distributed airdrop with contract */}
+                        {state === 'claim_pending' && distributedAirdrop && (
+                            <div className="space-y-4">
+                                <motion.div
+                                    initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                                    className="bg-gradient-to-br from-yellow-900/60 to-orange-900/40 border border-yellow-400/40 rounded-2xl p-5"
+                                >
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-12 h-12 rounded-full bg-yellow-400/20 flex items-center justify-center shrink-0">
+                                            <Gift className="w-6 h-6 text-yellow-300" />
+                                        </div>
+                                        <div>
+                                            <p className="text-white font-black text-base">{distributedAirdrop.label} — Claim Ready!</p>
+                                            <p className="text-yellow-300 text-xs mt-0.5">Your USDC is waiting on-chain 🟦</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-black/30 rounded-xl p-3 mb-4 text-center">
+                                        <p className="text-[10px] text-yellow-300 uppercase tracking-widest mb-1">Your payout</p>
+                                        <p className="text-3xl font-black text-yellow-300">
+                                            <span className="text-white">$</span>{distributedAirdrop.payout_per_person.toFixed(4)}
+                                            <span className="text-sm font-bold text-yellow-400 ml-1">USDC</span>
+                                        </p>
+                                        <p className="text-[10px] text-white/40 mt-1">You entered with $0.023 → +1,065% return 🚀</p>
+                                    </div>
+                                    <button
+                                        onClick={handleContractClaim}
+                                        disabled={isClaimPending}
+                                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-black text-base shadow-lg shadow-yellow-500/30 active:scale-95 transition-transform flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                                    >
+                                        {isClaimPending ? (
+                                            <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" /> Confirming in wallet...</>
+                                        ) : (
+                                            <><Sparkles className="w-5 h-5" /> Claim ${distributedAirdrop.payout_per_person.toFixed(4)} USDC</>
+                                        )}
+                                    </button>
+                                    <p className="text-center text-[10px] text-white/40 mt-2">Transaction on Base · Gas ~$0.01 · Builder Code attached 🟦</p>
+                                </motion.div>
+                                <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-start gap-2">
+                                    <Info className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                                    <p className="text-xs text-purple-200">After claiming, you can enter <strong>Airdrop Week 2</strong> — seeded with $2.30 USDC plus every entry fee!</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* CLAIM SUCCESS */}
+                        {state === 'claim_success' && distributedAirdrop && (
+                            <motion.div
+                                initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                                className="bg-gradient-to-br from-green-900/60 to-emerald-900/40 border border-green-400/30 rounded-2xl p-6 text-center space-y-3"
+                            >
+                                <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto">
+                                    <Trophy className="w-8 h-8 text-yellow-400" />
+                                </div>
+                                <h3 className="text-white font-black text-2xl">Claimed! 🎉</h3>
+                                <p className="text-green-300 text-sm">${distributedAirdrop.payout_per_person.toFixed(4)} USDC is on its way to your wallet</p>
+                                <button onClick={() => { setState('loading'); load(); }} className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 to-purple-700 text-white font-black text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform mt-2">
+                                    <Zap className="w-4 h-4" /> Enter Airdrop Week 2
+                                </button>
+                                <button onClick={onClose} className="w-full py-2 text-purple-400 text-sm">Close</button>
+                            </motion.div>
                         )}
 
                         {/* NO ACTIVE */}

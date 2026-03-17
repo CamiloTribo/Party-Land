@@ -12,6 +12,7 @@ export interface ActiveAirdrop {
     participant_count: number;
     payout_per_person: number;
     status: string;
+    contract_address?: string;
 }
 
 export interface AirdropParticipation {
@@ -48,9 +49,75 @@ export async function getActiveAirdropAction(): Promise<ActiveAirdrop | null> {
             participant_count: data.participant_count,
             payout_per_person: parseFloat(payout_per_person.toFixed(4)),
             status: data.status,
+            contract_address: data.contract_address ?? undefined,
         };
     } catch {
         return null;
+    }
+}
+
+/**
+ * Get the most recent distributed airdrop that has a smart contract.
+ * Used to show the "Claim your USDC" button if the user participated in it.
+ */
+export async function getDistributedAirdropWithContractAction(): Promise<ActiveAirdrop | null> {
+    try {
+        const supabase = getSupabaseService();
+        const { data, error } = await supabase
+            .from('airdrops')
+            .select('*')
+            .eq('status', 'distributed')
+            .not('contract_address', 'is', null)
+            .order('week_number', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (error || !data) return null;
+
+        const payout_per_person = data.participant_count > 0
+            ? data.pool_usdc / data.participant_count
+            : data.pool_usdc;
+
+        return {
+            id: data.id,
+            week_number: data.week_number,
+            label: data.label,
+            end_at: data.end_at,
+            pool_usdc: parseFloat(data.pool_usdc),
+            participant_count: data.participant_count,
+            payout_per_person: parseFloat(payout_per_person.toFixed(4)),
+            status: data.status,
+            contract_address: data.contract_address,
+        };
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Check if a user was a participant in a specific airdrop (by airdrop_id).
+ * Used for distributed airdrops — was this user eligible for the smart contract claim?
+ */
+export async function checkUserWasParticipantAction(
+    fid: number,
+    airdropId: string
+): Promise<{ wasParticipant: boolean; walletAddress?: string }> {
+    if (!fid || !airdropId) return { wasParticipant: false };
+    try {
+        const supabase = getSupabaseService();
+        const { data } = await supabase
+            .from('airdrop_participants')
+            .select('wallet_address')
+            .eq('airdrop_id', airdropId)
+            .eq('fid', fid)
+            .single();
+
+        return {
+            wasParticipant: !!data,
+            walletAddress: data?.wallet_address ?? undefined,
+        };
+    } catch {
+        return { wasParticipant: false };
     }
 }
 
