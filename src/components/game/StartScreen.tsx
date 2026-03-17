@@ -177,6 +177,7 @@ export default function StartScreen({
         <User className="w-6 h-6 text-yellow-400" />
       </button>
 
+
       {/* Launch Offer Button — pulsing below Profile */}
       <button
         onClick={() => { soundManager.play('bubble'); setShowOffer(true); }}
