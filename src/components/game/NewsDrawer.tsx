@@ -120,7 +120,13 @@ export function NewsDrawer({ isOpen, onClose, onOpenFCSkin, onOpenAirdrop, onOpe
                                 </div>
                                 <div>
                                     <h2 className="text-base font-black text-white leading-none">News & Updates</h2>
-                                    <p className="text-[11px] text-purple-400 font-medium mt-0.5">Party Land · {news.length} updates</p>
+                                    <p className="text-[11px] text-purple-400 font-medium mt-0.5 flex items-center gap-1.5">
+                                        Party Land
+                                        <span className="inline-flex items-center gap-1 bg-red-600/90 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                            1 new
+                                        </span>
+                                    </p>
                                 </div>
                             </div>
                         </div>

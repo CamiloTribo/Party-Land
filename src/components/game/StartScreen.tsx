@@ -14,6 +14,7 @@ import { NewsDrawer } from './NewsDrawer';
 import { FCSkinModal } from './FCSkinModal';
 import { useMiniApp } from '@neynar/react';
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface StartScreenProps {
   onStart: () => void;
@@ -56,6 +57,13 @@ export default function StartScreen({
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [showOffer, setShowOffer] = useState(false);
   const [showAirdrop, setShowAirdrop] = useState(false);
+  const [showWeek2Tag, setShowWeek2Tag] = useState(true);
+
+  // Show the 'WEEK 2' animated pill for 5 seconds on mount, then hide it
+  useEffect(() => {
+    const timer = setTimeout(() => setShowWeek2Tag(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
   const [showNews, setShowNews] = useState(false);
   const [showFCSkin, setShowFCSkin] = useState(false);
   const [showFCSkinAnnouncement, setShowFCSkinAnnouncement] = useState(false);
@@ -195,20 +203,37 @@ export default function StartScreen({
         </span>
       </button>
 
-      {/* 🪂 Airdrop Button — below OFFER */}
-      <button
-        onClick={() => { soundManager.play('bubble'); setShowAirdrop(true); }}
-        className="absolute top-[200px] right-2.5 w-14 h-14 z-10 flex items-center justify-center"
-        title="Weekly Airdrop"
-      >
-        <span className="absolute inline-flex h-full w-full rounded-full bg-violet-500 opacity-30 animate-ping" />
-        <span className="relative flex w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-purple-800 items-center justify-center shadow-[0_0_22px_rgba(139,92,246,0.65)] border-2 border-violet-400/50">
-          <Zap className="w-6 h-6 text-white" strokeWidth={2.5} />
-        </span>
-        <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-black text-violet-400 text-[8px] font-black px-1.5 py-0.5 rounded-full whitespace-nowrap shadow-md tracking-wide border border-violet-500/40">
-          AIRDROP
-        </span>
-      </button>
+      {/* 🪂 Airdrop Button — with animated WEEK 2 tag */}
+      <div className="absolute top-[200px] right-2.5 z-10 flex flex-col items-end">
+        {/* Animated WEEK 2 pill that expands from the button then hides */}
+        <AnimatePresence>
+          {showWeek2Tag && (
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0, originX: 1 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              exit={{ opacity: 0, scaleX: 0 }}
+              transition={{ type: 'spring', damping: 18, stiffness: 200 }}
+              className="mb-1.5 mr-1 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg shadow-red-500/40 whitespace-nowrap tracking-wide border border-red-400/50"
+            >
+              🪂 WEEK 2 IS LIVE!
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <button
+          onClick={() => { soundManager.play('bubble'); setShowAirdrop(true); }}
+          className="relative w-14 h-14 flex items-center justify-center"
+          title="Weekly Airdrop"
+        >
+          <span className="absolute inline-flex h-full w-full rounded-full bg-violet-500 opacity-30 animate-ping" />
+          <span className="relative flex w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-purple-800 items-center justify-center shadow-[0_0_22px_rgba(139,92,246,0.65)] border-2 border-violet-400/50">
+            <Zap className="w-6 h-6 text-white" strokeWidth={2.5} />
+          </span>
+          {/* Red NEW badge */}
+          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full whitespace-nowrap shadow-md tracking-wide border border-red-400/40">
+            NEW
+          </span>
+        </button>
+      </div>
 
       {/* Guide Button - Floating above Referrals */}
       {onResetTutorial && (
