@@ -345,7 +345,7 @@ export function AirdropModal({ isOpen, onClose }: AirdropModalProps) {
                                         </div>
                                         <div>
                                             <p className="text-white font-black text-base">{distributedAirdrop.label} — Claim Ready!</p>
-                                            <p className="text-yellow-300 text-xs mt-0.5">Your USDC is waiting on-chain 🟦</p>
+                                            <p className="text-yellow-300 text-xs mt-0.5">Your USDC is waiting on-chain</p>
                                         </div>
                                     </div>
                                     <div className="bg-black/30 rounded-xl p-3 mb-4 text-center">
@@ -354,7 +354,7 @@ export function AirdropModal({ isOpen, onClose }: AirdropModalProps) {
                                             <span className="text-white">$</span>{distributedAirdrop.payout_per_person.toFixed(4)}
                                             <span className="text-sm font-bold text-yellow-400 ml-1">USDC</span>
                                         </p>
-                                        <p className="text-[10px] text-white/40 mt-1">You entered with $0.023 → +1,065% return 🚀</p>
+                                        <p className="text-[10px] text-white/40 mt-1">You entered with $0.023 → +1,065% return</p>
                                     </div>
                                     <button
                                         onClick={handleContractClaim}
@@ -367,12 +367,7 @@ export function AirdropModal({ isOpen, onClose }: AirdropModalProps) {
                                             <><Sparkles className="w-5 h-5" /> Claim ${distributedAirdrop.payout_per_person.toFixed(4)} USDC</>
                                         )}
                                     </button>
-                                    <p className="text-center text-[10px] text-white/40 mt-2">Transaction on Base · Gas ~$0.01 · Builder Code attached 🟦</p>
                                 </motion.div>
-                                <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-start gap-2">
-                                    <Info className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                                    <p className="text-xs text-purple-200">After claiming, you can enter <strong>Airdrop Week 2</strong> — seeded with $2.30 USDC plus every entry fee!</p>
-                                </div>
                             </div>
                         )}
 
