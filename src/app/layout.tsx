@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     'fc:frame:icon': '/app-store-icon.png',
     'fc:frame:category': 'game',
     'base:app_id': '699eee0074175638d96bf31d',
-    'talentapp:project_verification': '50d453746ea3cd594b4b581928573558644a44caba3566d2a21e0fab1d9d4ee3492cb35c7821f78a8a6a5fc0a960b360769208282206361dc47ac5a48c00a8a4',
+    'talentapp:project_verification': 'ea0afb51967688084e396cf202a34ea6c88f414622fec42e3024c817489ccff7c7368aa19745bff0fcd676c9e46dc0e12d0a88bac39e98d50a23a91aab9c1f23',
   },
 };
 
